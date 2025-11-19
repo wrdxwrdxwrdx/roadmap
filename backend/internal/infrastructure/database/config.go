@@ -32,6 +32,13 @@ func (c *Config) DSN() string {
 	)
 }
 
+func (c *Config) DSNForMigrate() string {
+	return fmt.Sprintf(
+		"%s:%s@%s:%s/%s?sslmode=%s",
+		c.User, c.Password, c.Host, c.Port, c.DBName, c.SSLMode,
+	)
+}
+
 func getEnv(key, defaultValue string) string {
 	if value := os.Getenv(key); value != "" {
 		return value
