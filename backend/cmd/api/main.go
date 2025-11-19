@@ -11,6 +11,11 @@ import (
 func main() {
 	dbConfig := database.NewConfig()
 
+	if err := database.RunMigrations(dbConfig.DSNForMigrate(), "./migrations"); err != nil {
+		log.Fatalf("Failed to run migrations: %v", err)
+	}
+	log.Println("Migrations applied successfully")
+
 	db, err := database.NewDatabase(dbConfig)
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)

@@ -1,4 +1,4 @@
-.PHONY: up down build rebuild logs ps clean db-shell restart-api logs-api logs-db wait-health
+.PHONY: up down build rebuild logs ps clean db-shell db-tables db-describe db-size db-tables-size db-info restart-api logs-api logs-db wait-health
 
 # Start all services
 up:
@@ -16,8 +16,8 @@ wait-health:
 			exit 0; \
 		fi; \
 		echo "Waiting for API health check... ($$timeout seconds remaining)"; \
-		sleep 5; \
-		timeout=$$((timeout-5)); \
+		sleep 10; \
+		timeout=$$((timeout-10)); \
 	done; \
 	echo "⚠ Health check timeout. Check logs with 'make logs-api'"; \
 	docker-compose ps; \
@@ -50,6 +50,38 @@ clean:
 # Connect to database
 db-shell:
 	docker-compose exec postgres psql -U postgres -d roadmap
+
+# Show all tables
+db-tables:
+	@docker-compose exec postgres psql -U postgres -d roadmap -c "\dt"
+
+# Describe table structure (usage: make db-describe TABLE=users)
+db-describe:
+	@if [ -z "$(TABLE)" ]; then \
+		echo "Usage: make db-describe TABLE=table_name"; \
+		echo "Example: make db-describe TABLE=users"; \
+	else \
+		docker-compose exec postgres psql -U postgres -d roadmap -c "\d $(TABLE)"; \
+	fi
+
+# Show database sizes
+db-size:
+	@docker-compose exec postgres psql -U postgres -d roadmap -c "SELECT pg_size_pretty(pg_database_size('roadmap')) AS database_size;"
+
+# Show table sizes
+db-tables-size:
+	@docker-compose exec postgres psql -U postgres -d roadmap -c "SELECT schemaname, tablename, pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename)) AS size FROM pg_tables WHERE schemaname = 'public' ORDER BY pg_total_relation_size(schemaname||'.'||tablename) DESC;"
+
+# Show database info
+db-info:
+	@echo "=== Database Information ==="
+	@docker-compose exec postgres psql -U postgres -d roadmap -c "SELECT version();"
+	@echo ""
+	@echo "=== Current Database ==="
+	@docker-compose exec postgres psql -U postgres -d roadmap -c "SELECT current_database();"
+	@echo ""
+	@echo "=== All Tables ==="
+	@docker-compose exec postgres psql -U postgres -d roadmap -c "\dt"
 
 # Restart API service
 restart-api:

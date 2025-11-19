@@ -20,6 +20,8 @@ RUN apk --no-cache add ca-certificates tzdata curl
 
 COPY --from=builder /app/api .
 
+COPY --from=builder /app/migrations ./migrations
+
 EXPOSE 8080
 
 CMD ["./api"]
