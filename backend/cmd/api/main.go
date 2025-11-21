@@ -12,7 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func main() {
+func initDatabase() *database.Database {
 	dbConfig := database.NewConfig()
 
 	if err := database.RunMigrations(dbConfig.DSNForMigrate(), "./migrations"); err != nil {
@@ -24,9 +24,14 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
-	defer db.Close()
 
 	log.Println("Database connection established")
+	return db
+}
+
+func main() {
+	db := initDatabase()
+	defer db.Close()
 
 	router := gin.New()
 
