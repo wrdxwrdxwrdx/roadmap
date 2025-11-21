@@ -3,7 +3,6 @@
 # Coverage threshold (minimum required coverage percentage)
 COVERAGE_THRESHOLD ?= 50.0
 
-# Start all services (production)
 up:
 	docker-compose up -d --build
 	@echo "Waiting for services to be healthy..."
@@ -19,11 +18,6 @@ up-dev:
 	docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d frontend
 	@echo "✓ All services are up in development mode!"
 	@bash -c 'FRONTEND_PORT=$${FRONTEND_PORT:-3000}; API_PORT=$${API_PORT:-8080}; echo "  - Frontend (dev): http://localhost:$$FRONTEND_PORT"; echo "  - API: http://localhost:$$API_PORT"'
-
-# Start all services
-up-build:
-	docker-compose up -d --build
-	@make up
 
 # Start all services
 up-build:
@@ -296,7 +290,6 @@ workflow:
 	@echo ""
 	@echo "Note: To install golangci-lint for full linting:"
 	@echo "  go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest"
-
 # Show help message with all available commands
 help:
 	@echo "Available commands:"
@@ -326,12 +319,10 @@ help:
 	@echo "Testing commands:"
 	@echo "  make test            - Run all tests"
 	@echo "  make test-short      - Run tests with short summary"
-<<<<<<< HEAD
 	@echo "  make test-verbose    - Run tests with verbose output"
 	@echo "  make test-coverage   - Run tests with coverage report"
 	@echo "  make test-unit       - Run unit tests only"
 	@echo "  make test-integration - Run integration tests"
->>>>>>> c26dd4f (feat: Init frontend)
 	@echo ""
 	@echo "Code quality commands:"
 	@echo "  make lint            - Run linters"
@@ -346,13 +337,5 @@ help:
 	@echo "  make frontend-logs          - View frontend logs"
 	@echo "  make frontend-shell         - Open shell in frontend container"
 	@echo "  make frontend-clean-docker  - Clean frontend Docker images and containers"
-	@echo ""
-	@echo "Test commands:"
-	@echo "  make test            - Run all tests"
-	@echo "  make test-short      - Run tests and show short summary"
-	@echo "  make test-verbose    - Run tests with verbose output"
-	@echo "  make test-coverage   - Run tests with coverage report"
-	@echo "  make test-unit       - Run only unit tests"
-	@echo "  make test-integration - Run integration tests (requires database)"
 	@echo ""
 	@echo "  make help            - Show this help message"
