@@ -1,4 +1,4 @@
-.PHONY: up down build rebuild logs ps clean db-shell db-tables db-describe db-size db-tables-size db-info restart-api logs-api logs-db wait-health test test-short test-verbose test-coverage test-unit test-integration
+.PHONY: up down build rebuild logs ps clean db-shell db-tables db-describe db-size db-tables-size db-info restart-api logs-api logs-db wait-health test test-short test-verbose test-coverage test-unit test-integration lint lint-fix format workflow
 
 # Coverage threshold (minimum required coverage percentage)
 COVERAGE_THRESHOLD ?= 65.0
@@ -166,4 +166,78 @@ test-integration:
 	@echo "Running integration tests..."
 	@echo "Note: Integration tests require TEST_DB_DSN environment variable"
 	@cd backend && go test ./... -v -run Integration
+
+# Run linters
+lint:
+	@echo "Running linters..."
+	@cd backend && \
+	if command -v golangci-lint >/dev/null 2>&1; then \
+		echo "Running golangci-lint..."; \
+		golangci-lint run --timeout=5m || exit 1; \
+		echo "✓ golangci-lint passed"; \
+	else \
+		echo "⚠ golangci-lint not found. Skipping... (Install: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest)"; \
+	fi
+	@cd backend && echo "Running go vet..." && go vet ./... || exit 1
+	@cd backend && echo "Checking formatting..." && \
+	if [ "$$(gofmt -s -l . | wc -l)" -gt 0 ]; then \
+		echo "❌ Code is not formatted. Run 'make format' to fix."; \
+		gofmt -s -d .; \
+		exit 1; \
+	fi
+	@echo "✓ All linters passed"
+
+# Fix linting issues automatically
+lint-fix:
+	@echo "Fixing linting issues..."
+	@cd backend && \
+	if command -v golangci-lint >/dev/null 2>&1; then \
+		golangci-lint run --fix --timeout=5m; \
+	else \
+		echo "golangci-lint not found. Install it with: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest"; \
+		exit 1; \
+	fi
+	@cd backend && gofmt -s -w .
+	@echo "✓ Linting issues fixed"
+
+# Format code
+format:
+	@echo "Formatting code..."
+	@cd backend && gofmt -s -w .
+	@cd backend && goimports -w . || echo "goimports not found, skipping import formatting"
+	@echo "✓ Code formatted"
+
+# Run full CI workflow locally
+workflow:
+	@echo "========================================="
+	@echo "Running CI workflow locally..."
+	@echo "========================================="
+	@echo ""
+	@echo "Step 1/4: Running linters..."
+	@$(MAKE) lint || (echo "❌ Linting failed" && exit 1)
+	@echo ""
+	@echo "Step 2/4: Running tests..."
+	@$(MAKE) test-short || (echo "❌ Tests failed" && exit 1)
+	@echo ""
+	@echo "Step 3/4: Building..."
+	@cd backend && go build -v -o api ./cmd/api || (echo "❌ Build failed" && exit 1)
+	@echo "✓ Build successful"
+	@echo ""
+	@echo "Step 4/4: Checking binary..."
+	@if [ -f ./backend/api ]; then \
+		echo "✓ Binary exists"; \
+		ls -lh ./backend/api; \
+		rm -f ./backend/api; \
+		echo "✓ Binary cleaned up"; \
+	else \
+		echo "❌ Binary not found"; \
+		exit 1; \
+	fi
+	@echo ""
+	@echo "========================================="
+	@echo "✓ CI workflow completed successfully!"
+	@echo "========================================="
+	@echo ""
+	@echo "Note: To install golangci-lint for full linting:"
+	@echo "  go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest"
 

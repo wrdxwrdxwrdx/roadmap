@@ -118,4 +118,3 @@ func (s *LoginUseCaseTestSuite) TestLogin_JWTGenerationError() {
 func TestLoginUseCaseTestSuite(t *testing.T) {
 	suite.Run(t, new(LoginUseCaseTestSuite))
 }
-

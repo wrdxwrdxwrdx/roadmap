@@ -198,4 +198,3 @@ func TestJWTService_ValidateToken_NonStandardError(t *testing.T) {
 	assert.Nil(t, claims)
 	assert.Equal(t, ErrInvalidToken, err)
 }
-

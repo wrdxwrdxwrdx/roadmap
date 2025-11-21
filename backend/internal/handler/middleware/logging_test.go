@@ -62,4 +62,3 @@ func TestLoggingMiddleware_WithError(t *testing.T) {
 
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 }
-

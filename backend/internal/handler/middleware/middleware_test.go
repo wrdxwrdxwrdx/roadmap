@@ -44,4 +44,3 @@ func TestSetupMiddleware_WithPanic(t *testing.T) {
 
 	assert.Equal(t, http.StatusInternalServerError, w.Code)
 }
-

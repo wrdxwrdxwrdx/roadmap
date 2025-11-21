@@ -261,7 +261,7 @@ func (s *UserHandlerTestSuite) TestCreateUser_PasswordValidationError() {
 	requestBody := userdto.CreateUserRequest{
 		Email:    "test@example.com",
 		Username: "testuser",
-		Password: "alllowercase", 
+		Password: "alllowercase",
 	}
 
 	s.mockRepo.On("EmailExists", mock.Anything, requestBody.Email).Return(false, nil)
@@ -633,7 +633,7 @@ func (s *UserHandlerTestSuite) TestCreateUser_AllErrorTypes() {
 				requestBody.Username = "existinguser"
 			}
 			if tc.name == "PasswordValidationError returns exact error message" {
-				requestBody.Password = "alllowercase" 
+				requestBody.Password = "alllowercase"
 			}
 
 			body, _ := json.Marshal(requestBody)
