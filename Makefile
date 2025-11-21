@@ -3,7 +3,6 @@
 # Coverage threshold (minimum required coverage percentage)
 COVERAGE_THRESHOLD ?= 50.0
 
-# Start all services (production)
 up:
 	docker-compose up -d --build
 	@echo "Waiting for services to be healthy..."
@@ -308,8 +307,6 @@ workflow:
 	@echo "Note: To install golangci-lint for full linting:"
 	@echo "  go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest"
 
-=======
->>>>>>> 8926b15 (feat: CreateUser Handler + tests)
 # Show help message with all available commands
 help:
 	@echo "Available commands:"
@@ -344,7 +341,6 @@ help:
 	@echo "  make frontend-shell         - Open shell in frontend container"
 	@echo "  make frontend-clean-docker  - Clean frontend Docker images and containers"
 	@echo ""
-<<<<<<< HEAD
 	@echo "Testing commands:"
 	@echo "  make test            - Run all tests"
 	@echo "  make test-short      - Run tests with short summary"
@@ -358,14 +354,5 @@ help:
 	@echo "  make lint-fix        - Fix linting issues automatically"
 	@echo "  make format          - Format code"
 	@echo "  make workflow        - Run full CI workflow locally"
-=======
-	@echo "Test commands:"
-	@echo "  make test            - Run all tests"
-	@echo "  make test-short      - Run tests and show short summary"
-	@echo "  make test-verbose    - Run tests with verbose output"
-	@echo "  make test-coverage   - Run tests with coverage report"
-	@echo "  make test-unit       - Run only unit tests"
-	@echo "  make test-integration - Run integration tests (requires database)"
->>>>>>> 8926b15 (feat: CreateUser Handler + tests)
 	@echo ""
 	@echo "  make help            - Show this help message"
