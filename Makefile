@@ -1,4 +1,4 @@
-.PHONY: up up-dev down build rebuild logs ps clean db-shell db-tables db-describe db-size db-tables-size db-info restart-api logs-api logs-db logs-frontend wait-health frontend-build-docker frontend-dev-docker frontend-restart frontend-logs frontend-shell frontend-clean-docker help
+.PHONY: up up-dev down build rebuild logs ps clean db-shell db-tables db-describe db-size db-tables-size db-info restart-api logs-api logs-db logs-frontend wait-health frontend-build-docker frontend-dev-docker frontend-restart frontend-logs frontend-shell frontend-clean-docker test test-short test-verbose test-coverage test-unit test-integration help
 
 # Start all services (production)
 up:
@@ -16,6 +16,11 @@ up-dev:
 	docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d frontend
 	@echo "✓ All services are up in development mode!"
 	@bash -c 'FRONTEND_PORT=$${FRONTEND_PORT:-3000}; API_PORT=$${API_PORT:-8080}; echo "  - Frontend (dev): http://localhost:$$FRONTEND_PORT"; echo "  - API: http://localhost:$$API_PORT"'
+
+# Start all services
+up-build:
+	docker-compose up -d --build
+	@make up
 
 # Wait for API health check to pass
 wait-health:
@@ -146,6 +151,52 @@ frontend-clean-docker:
 	docker-compose -f docker-compose.yml -f docker-compose.dev.yml down frontend 2>/dev/null || true
 	docker rmi roadmap-frontend roadmap-frontend-dev 2>/dev/null || true
 
+# Run all tests
+test:
+	@echo "Running all tests..."
+	@cd backend && go test ./... -v || (echo "Some tests failed. Check output above for details." && exit 1)
+
+# Run tests and show short summary (one line)
+test-short:
+	@cd backend && go test ./... -json 2>&1 | \
+	awk 'BEGIN {passed=0; failed=0} \
+		/"Action":"pass"/ {passed++} \
+		/"Action":"fail"/ {failed++} \
+		END { \
+			total=passed+failed; \
+			if (failed > 0) { \
+				printf "Tests: %d/%d passed, %d failed\n", passed, total, failed; \
+				exit 1; \
+			} else if (total > 0) { \
+				printf "Tests: %d/%d passed\n", passed, total; \
+			} else { \
+				printf "No tests found\n"; \
+			} \
+		}'
+
+# Run tests with verbose output
+test-verbose:
+	@echo "Running all tests with verbose output..."
+	@cd backend && go test ./... -v -count=1
+
+# Run tests with coverage
+test-coverage:
+	@echo "Running tests with coverage..."
+	@cd backend && go test ./... -coverprofile=coverage.out
+	@cd backend && go tool cover -html=coverage.out -o coverage.html
+	@echo "Coverage report generated: backend/coverage.html"
+
+# Run only unit tests (excluding integration tests)
+test-unit:
+	@echo "Running unit tests..."
+	@cd backend && go test ./... -v -short
+
+# Run integration tests (requires database)
+test-integration:
+	@echo "Running integration tests..."
+	@echo "Note: Integration tests require TEST_DB_DSN environment variable"
+	@cd backend && go test ./... -v -run Integration
+
 # Show help message with all available commands
 help:
 	@echo "Available commands:"
@@ -179,5 +230,13 @@ help:
 	@echo "  make frontend-logs          - View frontend logs"
 	@echo "  make frontend-shell         - Open shell in frontend container"
 	@echo "  make frontend-clean-docker  - Clean frontend Docker images and containers"
+	@echo ""
+	@echo "Test commands:"
+	@echo "  make test            - Run all tests"
+	@echo "  make test-short      - Run tests and show short summary"
+	@echo "  make test-verbose    - Run tests with verbose output"
+	@echo "  make test-coverage   - Run tests with coverage report"
+	@echo "  make test-unit       - Run only unit tests"
+	@echo "  make test-integration - Run integration tests (requires database)"
 	@echo ""
 	@echo "  make help            - Show this help message"
