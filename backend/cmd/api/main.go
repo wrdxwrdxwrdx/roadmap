@@ -4,7 +4,10 @@ import (
 	"log"
 	"roadmap/internal/handler"
 	"roadmap/internal/handler/middleware"
+	userhandler "roadmap/internal/handler/user"
 	"roadmap/internal/infrastructure/database"
+	userrepo "roadmap/internal/repository/user"
+	userusecase "roadmap/internal/usecase/user"
 
 	"github.com/gin-gonic/gin"
 )
@@ -25,13 +28,21 @@ func main() {
 
 	log.Println("Database connection established")
 
-	// Create router without default middleware (we'll add our own)
 	router := gin.New()
 
-	// Setup middleware (recovery, CORS, logging)
 	middleware.SetupMiddleware(router)
 
-	// Routes
+	userRepository := userrepo.NewUserRepository(db)
+
+	createUserUseCase := userusecase.NewCreateUserUseCase(userRepository)
+
+	userHandler := userhandler.NewUserHandler(createUserUseCase)
+
+	api := router.Group("/api/v1")
+	{
+		userhandler.SetupUserRoutes(api, userHandler)
+	}
+
 	router.GET("/health", handler.HealthHandler)
 
 	if err := router.Run(":8080"); err != nil {
