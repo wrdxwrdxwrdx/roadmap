@@ -1,0 +1,793 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>api: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">roadmap/cmd/api/main.go (0.0%)</option>
+				
+				<option value="file1">roadmap/internal/handler/health.go (0.0%)</option>
+				
+				<option value="file2">roadmap/internal/handler/middleware/cors.go (0.0%)</option>
+				
+				<option value="file3">roadmap/internal/handler/middleware/logging.go (0.0%)</option>
+				
+				<option value="file4">roadmap/internal/handler/middleware/middleware.go (0.0%)</option>
+				
+				<option value="file5">roadmap/internal/handler/middleware/recovery.go (0.0%)</option>
+				
+				<option value="file6">roadmap/internal/handler/user/routes.go (0.0%)</option>
+				
+				<option value="file7">roadmap/internal/handler/user/user.go (100.0%)</option>
+				
+				<option value="file8">roadmap/internal/infrastructure/database/config.go (0.0%)</option>
+				
+				<option value="file9">roadmap/internal/infrastructure/database/migrate.go (0.0%)</option>
+				
+				<option value="file10">roadmap/internal/infrastructure/database/postgres.go (0.0%)</option>
+				
+				<option value="file11">roadmap/internal/repository/user/user.go (0.0%)</option>
+				
+				<option value="file12">roadmap/internal/usecase/user/create_user.go (97.7%)</option>
+				
+				<option value="file13">roadmap/internal/usecase/user/errors.go (0.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package main
+
+import (
+        "log"
+        "roadmap/internal/handler"
+        "roadmap/internal/handler/middleware"
+        userhandler "roadmap/internal/handler/user"
+        "roadmap/internal/infrastructure/database"
+        userrepo "roadmap/internal/repository/user"
+        userusecase "roadmap/internal/usecase/user"
+
+        "github.com/gin-gonic/gin"
+)
+
+func main() <span class="cov0" title="0">{
+        dbConfig := database.NewConfig()
+
+        if err := database.RunMigrations(dbConfig.DSNForMigrate(), "./migrations"); err != nil </span><span class="cov0" title="0">{
+                log.Fatalf("Failed to run migrations: %v", err)
+        }</span>
+        <span class="cov0" title="0">log.Println("Migrations applied successfully")
+
+        db, err := database.NewDatabase(dbConfig)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatalf("Failed to connect to database: %v", err)
+        }</span>
+        <span class="cov0" title="0">defer db.Close()
+
+        log.Println("Database connection established")
+
+        router := gin.New()
+
+        middleware.SetupMiddleware(router)
+
+        userRepository := userrepo.NewUserRepository(db)
+
+        createUserUseCase := userusecase.NewCreateUserUseCase(userRepository)
+
+        userHandler := userhandler.NewUserHandler(createUserUseCase)
+
+        api := router.Group("/api/v1")
+        </span><span class="cov0" title="0">{
+                userhandler.SetupUserRoutes(api, userHandler)
+                log.Println("User routes registered at /api/v1/users")
+        }</span>
+
+        <span class="cov0" title="0">router.GET("/health", handler.HealthHandler)
+
+        if err := router.Run(":8080"); err != nil </span><span class="cov0" title="0">{
+                log.Fatalf("Failed to start server: %v", err)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package handler
+
+import (
+        "net/http"
+
+        "github.com/gin-gonic/gin"
+)
+
+func HealthHandler(c *gin.Context) <span class="cov0" title="0">{
+        c.JSON(http.StatusOK, gin.H{
+                "status":  "ok",
+                "service": "roadmap-api",
+        })
+}</span>
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package middleware
+
+import (
+        "github.com/gin-contrib/cors"
+        "github.com/gin-gonic/gin"
+)
+
+func CORSMiddleware() gin.HandlerFunc <span class="cov0" title="0">{
+        config := cors.DefaultConfig()
+
+        config.AllowAllOrigins = true
+
+        config.AllowMethods = []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"}
+
+        config.AllowHeaders = []string{
+                "Origin",
+                "Content-Length",
+                "Content-Type",
+                "Authorization",
+                "Accept",
+                "X-Requested-With",
+        }
+
+        config.ExposeHeaders = []string{
+                "Content-Length",
+                "Content-Type",
+                "Authorization",
+        }
+
+        config.AllowCredentials = true
+
+        config.MaxAge = 43200
+
+        return cors.New(config)
+}</span>
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package middleware
+
+import (
+        "log"
+        "time"
+
+        "github.com/gin-gonic/gin"
+)
+
+func LoggingMiddleware() gin.HandlerFunc <span class="cov0" title="0">{
+        return func(c *gin.Context) </span><span class="cov0" title="0">{
+                start := time.Now()
+                path := c.Request.URL.Path
+                raw := c.Request.URL.RawQuery
+
+                c.Next()
+
+                latency := time.Since(start)
+                clientIP := c.ClientIP()
+                method := c.Request.Method
+                statusCode := c.Writer.Status()
+                errorMessage := c.Errors.ByType(gin.ErrorTypePrivate).String()
+
+                if raw != "" </span><span class="cov0" title="0">{
+                        path = path + "?" + raw
+                }</span>
+
+                <span class="cov0" title="0">if errorMessage != "" </span><span class="cov0" title="0">{
+                        log.Printf("[%s] %s %s %d %v %s - Error: %s",
+                                clientIP, method, path, statusCode, latency, c.Request.UserAgent(), errorMessage)
+                }</span> else<span class="cov0" title="0"> {
+                        log.Printf("[%s] %s %s %d %v %s",
+                                clientIP, method, path, statusCode, latency, c.Request.UserAgent())
+                }</span>
+        }
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package middleware
+
+import (
+        "github.com/gin-gonic/gin"
+)
+
+func SetupMiddleware(router *gin.Engine) <span class="cov0" title="0">{
+        router.Use(RecoveryMiddleware())
+
+        router.Use(CORSMiddleware())
+
+        router.Use(LoggingMiddleware())
+}</span>
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package middleware
+
+import (
+        "log"
+        "net/http"
+
+        "github.com/gin-gonic/gin"
+)
+
+func RecoveryMiddleware() gin.HandlerFunc <span class="cov0" title="0">{
+        return gin.CustomRecovery(func(c *gin.Context, recovered interface{}) </span><span class="cov0" title="0">{
+                log.Printf("Panic recovered: %v", recovered)
+
+                c.JSON(http.StatusInternalServerError, gin.H{
+                        "error":   "Internal server error",
+                        "message": "An unexpected error occurred",
+                })
+
+                c.Abort()
+        }</span>)
+}
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package userhandler
+
+import (
+        "log"
+
+        "github.com/gin-gonic/gin"
+)
+
+func SetupUserRoutes(router *gin.RouterGroup, handler *UserHandler) <span class="cov0" title="0">{
+        users := router.Group("/users")
+        </span><span class="cov0" title="0">{
+                users.POST("", handler.CreateUser)
+                log.Println("POST /api/v1/users route registered")
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package userhandler
+
+import (
+        "errors"
+        "net/http"
+
+        "github.com/gin-gonic/gin"
+
+        userdto "roadmap/internal/domain/dto/user"
+        userusecase "roadmap/internal/usecase/user"
+)
+
+type UserHandler struct {
+        createUserUseCase *userusecase.CreateUserUseCase
+}
+
+func NewUserHandler(createUserUseCase *userusecase.CreateUserUseCase) *UserHandler <span class="cov8" title="1">{
+        return &amp;UserHandler{
+                createUserUseCase: createUserUseCase,
+        }
+}</span>
+
+func (h *UserHandler) CreateUser(c *gin.Context) <span class="cov8" title="1">{
+        var req userdto.CreateUserRequest
+
+        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov8" title="1">{
+                c.JSON(http.StatusBadRequest, gin.H{
+                        "error":   "Invalid request data",
+                        "details": err.Error(),
+                })
+                return
+        }</span>
+
+        <span class="cov8" title="1">response, err := h.createUserUseCase.Execute(c.Request.Context(), req)
+        if err != nil </span><span class="cov8" title="1">{
+                statusCode := http.StatusInternalServerError
+                errorMessage := "Failed to create user"
+
+                if errors.Is(err, userusecase.ErrEmailAlreadyExists) </span><span class="cov8" title="1">{
+                        statusCode = http.StatusConflict
+                        errorMessage = "Email already exists"
+                }</span> else<span class="cov8" title="1"> if errors.Is(err, userusecase.ErrUsernameAlreadyExists) </span><span class="cov8" title="1">{
+                        statusCode = http.StatusConflict
+                        errorMessage = "Username already exists"
+                }</span> else<span class="cov8" title="1"> {
+                        var passwordErr *userusecase.PasswordValidationError
+                        if errors.As(err, &amp;passwordErr) </span><span class="cov8" title="1">{
+                                statusCode = http.StatusBadRequest
+                                errorMessage = passwordErr.Error()
+                        }</span>
+                }
+
+                <span class="cov8" title="1">c.JSON(statusCode, gin.H{
+                        "error": errorMessage,
+                })
+                return</span>
+        }
+
+        <span class="cov8" title="1">c.JSON(http.StatusCreated, response)</span>
+}
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">package database
+
+import (
+        "fmt"
+        "os"
+)
+
+type Config struct {
+        Host     string
+        Port     string
+        User     string
+        Password string
+        DBName   string
+        SSLMode  string
+}
+
+func NewConfig() *Config <span class="cov0" title="0">{
+        return &amp;Config{
+                Host:     getEnv("DB_HOST", "localhost"),
+                Port:     getEnv("DB_PORT", "5432"),
+                User:     getEnv("DB_USER", "postgres"),
+                Password: getEnv("DB_PASSWORD", "password"),
+                DBName:   getEnv("DB_NAME", "roadmap"),
+                SSLMode:  getEnv("DB_SSLMODE", "disable"),
+        }
+}</span>
+
+func (c *Config) DSN() string <span class="cov0" title="0">{
+        return fmt.Sprintf(
+                "host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+                c.Host, c.Port, c.User, c.Password, c.DBName, c.SSLMode,
+        )
+}</span>
+
+func (c *Config) DSNForMigrate() string <span class="cov0" title="0">{
+        return fmt.Sprintf(
+                "%s:%s@%s:%s/%s?sslmode=%s",
+                c.User, c.Password, c.Host, c.Port, c.DBName, c.SSLMode,
+        )
+}</span>
+
+func getEnv(key, defaultValue string) string <span class="cov0" title="0">{
+        if value := os.Getenv(key); value != "" </span><span class="cov0" title="0">{
+                return value
+        }</span>
+        <span class="cov0" title="0">return defaultValue</span>
+}
+</pre>
+		
+		<pre class="file" id="file9" style="display: none">package database
+
+import (
+        "fmt"
+        "path/filepath"
+
+        "github.com/golang-migrate/migrate/v4"
+        _ "github.com/golang-migrate/migrate/v4/database/postgres"
+        _ "github.com/golang-migrate/migrate/v4/source/file"
+)
+
+func RunMigrations(dsn string, migrationsPath string) error <span class="cov0" title="0">{
+        absPath, err := filepath.Abs(migrationsPath)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to get absolute path: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">migrationsURL := fmt.Sprintf("file://%s", absPath)
+        dbURL := fmt.Sprintf("postgres://%s", dsn)
+
+        m, err := migrate.New(migrationsURL, dbURL)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to create migrate instance: %w", err)
+        }</span>
+        <span class="cov0" title="0">defer m.Close()
+
+        if err := m.Up(); err != nil &amp;&amp; err != migrate.ErrNoChange </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to run migrations: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file10" style="display: none">package database
+
+import (
+        "context"
+        "fmt"
+        "time"
+
+        "github.com/jackc/pgx/v5/pgxpool"
+)
+
+type Database struct {
+        Pool *pgxpool.Pool
+}
+
+func NewDatabase(cfg *Config) (*Database, error) <span class="cov0" title="0">{
+        ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+        defer cancel()
+
+        pool, err := pgxpool.New(ctx, cfg.DSN())
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to create connection pool: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">if err := pool.Ping(ctx); err != nil </span><span class="cov0" title="0">{
+                pool.Close()
+                return nil, fmt.Errorf("failed to ping database: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">return &amp;Database{Pool: pool}, nil</span>
+}
+
+func (d *Database) Close() <span class="cov0" title="0">{
+        if d.Pool != nil </span><span class="cov0" title="0">{
+                d.Pool.Close()
+        }</span>
+}
+
+func (d *Database) Ping(ctx context.Context) error <span class="cov0" title="0">{
+        return d.Pool.Ping(ctx)
+}</span>
+</pre>
+		
+		<pre class="file" id="file11" style="display: none">package user
+
+import (
+        "context"
+        "fmt"
+
+        userentity "roadmap/internal/domain/entities/user"
+        "roadmap/internal/infrastructure/database"
+
+        "github.com/google/uuid"
+        "github.com/jackc/pgx/v5"
+)
+
+type userRepository struct {
+        db *database.Database
+}
+
+func NewUserRepository(db *database.Database) UserRepository <span class="cov0" title="0">{
+        return &amp;userRepository{
+                db: db,
+        }
+}</span>
+
+func (r *userRepository) Create(ctx context.Context, user *userentity.User) (*userentity.User, error) <span class="cov0" title="0">{
+        query := `
+                INSERT INTO users (id, email, password_hash, username, created_at, updated_at)
+                VALUES ($1, $2, $3, $4, $5, $6)
+                RETURNING id, email, password_hash, username, created_at, updated_at
+        `
+
+        var createdUser userentity.User
+        err := r.db.Pool.QueryRow(ctx, query,
+                user.ID,
+                user.Email,
+                user.PasswordHash,
+                user.Username,
+                user.CreatedAt,
+                user.UpdatedAt,
+        ).Scan(
+                &amp;createdUser.ID,
+                &amp;createdUser.Email,
+                &amp;createdUser.PasswordHash,
+                &amp;createdUser.Username,
+                &amp;createdUser.CreatedAt,
+                &amp;createdUser.UpdatedAt,
+        )
+
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to create user: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">return &amp;createdUser, nil</span>
+}
+
+func (r *userRepository) GetByID(ctx context.Context, id uuid.UUID) (*userentity.User, error) <span class="cov0" title="0">{
+        query := `
+                SELECT id, email, password_hash, username, created_at, updated_at
+                FROM users
+                WHERE id = $1
+        `
+
+        var user userentity.User
+        err := r.db.Pool.QueryRow(ctx, query, id).Scan(
+                &amp;user.ID,
+                &amp;user.Email,
+                &amp;user.PasswordHash,
+                &amp;user.Username,
+                &amp;user.CreatedAt,
+                &amp;user.UpdatedAt,
+        )
+
+        if err != nil </span><span class="cov0" title="0">{
+                if err == pgx.ErrNoRows </span><span class="cov0" title="0">{
+                        return nil, fmt.Errorf("user not found: %w", err)
+                }</span>
+                <span class="cov0" title="0">return nil, fmt.Errorf("failed to get user by id: %w", err)</span>
+        }
+
+        <span class="cov0" title="0">return &amp;user, nil</span>
+}
+
+func (r *userRepository) GetByEmail(ctx context.Context, email string) (*userentity.User, error) <span class="cov0" title="0">{
+        query := `
+                SELECT id, email, password_hash, username, created_at, updated_at
+                FROM users
+                WHERE email = $1
+        `
+
+        var user userentity.User
+        err := r.db.Pool.QueryRow(ctx, query, email).Scan(
+                &amp;user.ID,
+                &amp;user.Email,
+                &amp;user.PasswordHash,
+                &amp;user.Username,
+                &amp;user.CreatedAt,
+                &amp;user.UpdatedAt,
+        )
+
+        if err != nil </span><span class="cov0" title="0">{
+                if err == pgx.ErrNoRows </span><span class="cov0" title="0">{
+                        return nil, fmt.Errorf("user not found: %w", err)
+                }</span>
+                <span class="cov0" title="0">return nil, fmt.Errorf("failed to get user by email: %w", err)</span>
+        }
+
+        <span class="cov0" title="0">return &amp;user, nil</span>
+}
+
+func (r *userRepository) EmailExists(ctx context.Context, email string) (bool, error) <span class="cov0" title="0">{
+        query := `SELECT EXISTS(SELECT 1 FROM users WHERE email = $1)`
+
+        var exists bool
+        err := r.db.Pool.QueryRow(ctx, query, email).Scan(&amp;exists)
+        if err != nil </span><span class="cov0" title="0">{
+                return false, fmt.Errorf("failed to check email existence: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">return exists, nil</span>
+}
+
+func (r *userRepository) UsernameExists(ctx context.Context, username string) (bool, error) <span class="cov0" title="0">{
+        query := `SELECT EXISTS(SELECT 1 FROM users WHERE username = $1)`
+
+        var exists bool
+        err := r.db.Pool.QueryRow(ctx, query, username).Scan(&amp;exists)
+        if err != nil </span><span class="cov0" title="0">{
+                return false, fmt.Errorf("failed to check username existence: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">return exists, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file12" style="display: none">package user
+
+import (
+        "context"
+        "fmt"
+        "strings"
+        "time"
+        "unicode"
+
+        "github.com/google/uuid"
+        "golang.org/x/crypto/bcrypt"
+
+        userdto "roadmap/internal/domain/dto/user"
+        userentity "roadmap/internal/domain/entities/user"
+        userrepo "roadmap/internal/repository/user"
+)
+
+type CreateUserUseCase struct {
+        userRepository userrepo.UserRepository
+}
+
+func NewCreateUserUseCase(userRepository userrepo.UserRepository) *CreateUserUseCase <span class="cov8" title="1">{
+        return &amp;CreateUserUseCase{userRepository: userRepository}
+}</span>
+
+func validatePassword(password string) error <span class="cov8" title="1">{
+        const minLength = 8
+
+        if len(password) &lt; minLength </span><span class="cov8" title="1">{
+                return &amp;PasswordValidationError{
+                        Message: fmt.Sprintf("password must be at least %d characters long", minLength),
+                }
+        }</span>
+
+        <span class="cov8" title="1">var (
+                hasUpper   = false
+                hasLower   = false
+                hasNumber  = false
+                hasSpecial = false
+        )
+
+        for _, char := range password </span><span class="cov8" title="1">{
+                switch </span>{
+                case unicode.IsUpper(char):<span class="cov8" title="1">
+                        hasUpper = true</span>
+                case unicode.IsLower(char):<span class="cov8" title="1">
+                        hasLower = true</span>
+                case unicode.IsNumber(char):<span class="cov8" title="1">
+                        hasNumber = true</span>
+                case unicode.IsPunct(char) || unicode.IsSymbol(char) || strings.ContainsRune("!@#$%^&amp;*()_+-=[]{}|;:,.&lt;&gt;?", char):<span class="cov8" title="1">
+                        hasSpecial = true</span>
+                }
+        }
+
+        <span class="cov8" title="1">var missing []string
+        if !hasUpper </span><span class="cov8" title="1">{
+                missing = append(missing, "uppercase letter")
+        }</span>
+        <span class="cov8" title="1">if !hasLower </span><span class="cov8" title="1">{
+                missing = append(missing, "lowercase letter")
+        }</span>
+        <span class="cov8" title="1">if !hasNumber </span><span class="cov8" title="1">{
+                missing = append(missing, "number")
+        }</span>
+        <span class="cov8" title="1">if !hasSpecial </span><span class="cov8" title="1">{
+                missing = append(missing, "special character")
+        }</span>
+
+        <span class="cov8" title="1">if len(missing) &gt; 0 </span><span class="cov8" title="1">{
+                return &amp;PasswordValidationError{
+                        Message: fmt.Sprintf("password must contain at least one: %s", strings.Join(missing, ", ")),
+                }
+        }</span>
+
+        <span class="cov8" title="1">return nil</span>
+}
+
+func (u *CreateUserUseCase) Execute(ctx context.Context, req userdto.CreateUserRequest) (userdto.CreateUserResponse, error) <span class="cov8" title="1">{
+        emailExists, err := u.userRepository.EmailExists(ctx, req.Email)
+        if err != nil </span><span class="cov8" title="1">{
+                return userdto.CreateUserResponse{}, err
+        }</span>
+        <span class="cov8" title="1">if emailExists </span><span class="cov8" title="1">{
+                return userdto.CreateUserResponse{}, ErrEmailAlreadyExists
+        }</span>
+
+        <span class="cov8" title="1">usernameExists, err := u.userRepository.UsernameExists(ctx, req.Username)
+        if err != nil </span><span class="cov8" title="1">{
+                return userdto.CreateUserResponse{}, err
+        }</span>
+        <span class="cov8" title="1">if usernameExists </span><span class="cov8" title="1">{
+                return userdto.CreateUserResponse{}, ErrUsernameAlreadyExists
+        }</span>
+
+        <span class="cov8" title="1">if err := validatePassword(req.Password); err != nil </span><span class="cov8" title="1">{
+                return userdto.CreateUserResponse{}, err
+        }</span>
+
+        <span class="cov8" title="1">passwordHash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+        if err != nil </span><span class="cov0" title="0">{
+                return userdto.CreateUserResponse{}, err
+        }</span>
+
+        <span class="cov8" title="1">now := time.Now()
+        user := &amp;userentity.User{
+                ID:           uuid.New(),
+                Username:     req.Username,
+                Email:        req.Email,
+                PasswordHash: string(passwordHash),
+                CreatedAt:    now,
+                UpdatedAt:    now,
+        }
+
+        createdUser, err := u.userRepository.Create(ctx, user)
+        if err != nil </span><span class="cov8" title="1">{
+                return userdto.CreateUserResponse{}, err
+        }</span>
+
+        <span class="cov8" title="1">return userdto.CreateUserResponse{
+                ID:        createdUser.ID,
+                Username:  createdUser.Username,
+                Email:     createdUser.Email,
+                CreatedAt: createdUser.CreatedAt,
+                UpdatedAt: createdUser.UpdatedAt,
+        }, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file13" style="display: none">package user
+
+import "errors"
+
+var (
+        ErrEmailAlreadyExists    = errors.New("email already exists")
+        ErrUsernameAlreadyExists = errors.New("username already exists")
+)
+
+type PasswordValidationError struct {
+        Message string
+}
+
+func (e *PasswordValidationError) Error() string <span class="cov0" title="0">{
+        return e.Message
+}</span>
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
