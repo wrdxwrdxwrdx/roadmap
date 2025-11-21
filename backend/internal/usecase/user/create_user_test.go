@@ -16,7 +16,6 @@ import (
 	userentity "roadmap/internal/domain/entities/user"
 )
 
-// MockUserRepository is a mock implementation of UserRepository
 type MockUserRepository struct {
 	mock.Mock
 }
@@ -55,7 +54,6 @@ func (m *MockUserRepository) UsernameExists(ctx context.Context, username string
 	return args.Bool(0), args.Error(1)
 }
 
-// CreateUserUseCaseTestSuite is a test suite for CreateUserUseCase
 type CreateUserUseCaseTestSuite struct {
 	suite.Suite
 	useCase      *CreateUserUseCase
@@ -91,7 +89,6 @@ func (s *CreateUserUseCaseTestSuite) TearDownTest() {
 	s.mockRepo.AssertExpectations(s.T())
 }
 
-// TestCreateUser_Success tests successful user creation
 func (s *CreateUserUseCaseTestSuite) TestCreateUser_Success() {
 	s.mockRepo.On("EmailExists", s.ctx, s.validRequest.Email).Return(false, nil)
 	s.mockRepo.On("UsernameExists", s.ctx, s.validRequest.Username).Return(false, nil)
@@ -107,7 +104,6 @@ func (s *CreateUserUseCaseTestSuite) TestCreateUser_Success() {
 	assert.Equal(s.T(), s.validUser.UpdatedAt, response.UpdatedAt)
 }
 
-// TestCreateUser_EmailAlreadyExists tests error when email already exists
 func (s *CreateUserUseCaseTestSuite) TestCreateUser_EmailAlreadyExists() {
 	s.mockRepo.On("EmailExists", s.ctx, s.validRequest.Email).Return(true, nil)
 
@@ -117,11 +113,9 @@ func (s *CreateUserUseCaseTestSuite) TestCreateUser_EmailAlreadyExists() {
 	assert.True(s.T(), errors.Is(err, ErrEmailAlreadyExists))
 	assert.Equal(s.T(), userdto.CreateUserResponse{}, response)
 
-	// Verify UsernameExists was not called
 	s.mockRepo.AssertNotCalled(s.T(), "UsernameExists", s.ctx, s.validRequest.Username)
 }
 
-// TestCreateUser_UsernameAlreadyExists tests error when username already exists
 func (s *CreateUserUseCaseTestSuite) TestCreateUser_UsernameAlreadyExists() {
 	s.mockRepo.On("EmailExists", s.ctx, s.validRequest.Email).Return(false, nil)
 	s.mockRepo.On("UsernameExists", s.ctx, s.validRequest.Username).Return(true, nil)
@@ -133,7 +127,6 @@ func (s *CreateUserUseCaseTestSuite) TestCreateUser_UsernameAlreadyExists() {
 	assert.Equal(s.T(), userdto.CreateUserResponse{}, response)
 }
 
-// TestCreateUser_EmailExistsError tests error from EmailExists repository call
 func (s *CreateUserUseCaseTestSuite) TestCreateUser_EmailExistsError() {
 	repoError := errors.New("database connection error")
 	s.mockRepo.On("EmailExists", s.ctx, s.validRequest.Email).Return(false, repoError)
@@ -145,7 +138,6 @@ func (s *CreateUserUseCaseTestSuite) TestCreateUser_EmailExistsError() {
 	assert.Equal(s.T(), userdto.CreateUserResponse{}, response)
 }
 
-// TestCreateUser_UsernameExistsError tests error from UsernameExists repository call
 func (s *CreateUserUseCaseTestSuite) TestCreateUser_UsernameExistsError() {
 	repoError := errors.New("database connection error")
 	s.mockRepo.On("EmailExists", s.ctx, s.validRequest.Email).Return(false, nil)
@@ -158,7 +150,6 @@ func (s *CreateUserUseCaseTestSuite) TestCreateUser_UsernameExistsError() {
 	assert.Equal(s.T(), userdto.CreateUserResponse{}, response)
 }
 
-// TestCreateUser_CreateError tests error from Create repository call
 func (s *CreateUserUseCaseTestSuite) TestCreateUser_CreateError() {
 	repoError := errors.New("failed to insert user")
 	s.mockRepo.On("EmailExists", s.ctx, s.validRequest.Email).Return(false, nil)
@@ -172,7 +163,6 @@ func (s *CreateUserUseCaseTestSuite) TestCreateUser_CreateError() {
 	assert.Equal(s.T(), userdto.CreateUserResponse{}, response)
 }
 
-// TestValidatePassword tests password validation with table-driven approach
 func TestValidatePassword(t *testing.T) {
 	tests := []struct {
 		name      string
@@ -266,7 +256,6 @@ func TestValidatePassword(t *testing.T) {
 				assert.True(t, errors.As(err, &passwordErr), "error should be PasswordValidationError")
 				assert.NotEmpty(t, passwordErr.Message)
 
-				// Verify error message contains expected information
 				if tt.errorType == "length" {
 					assert.Contains(t, passwordErr.Message, "at least")
 					assert.Contains(t, passwordErr.Message, "characters long")
@@ -288,7 +277,6 @@ func TestValidatePassword(t *testing.T) {
 	}
 }
 
-// TestCreateUser_PasswordValidation tests password validation in the use case
 func (s *CreateUserUseCaseTestSuite) TestCreateUser_PasswordValidation() {
 	testCases := []struct {
 		name        string
@@ -349,12 +337,10 @@ func (s *CreateUserUseCaseTestSuite) TestCreateUser_PasswordValidation() {
 	}
 }
 
-// TestCreateUser_PasswordHashing verifies that password is hashed correctly
 func (s *CreateUserUseCaseTestSuite) TestCreateUser_PasswordHashing() {
 	s.mockRepo.On("EmailExists", s.ctx, s.validRequest.Email).Return(false, nil)
 	s.mockRepo.On("UsernameExists", s.ctx, s.validRequest.Username).Return(false, nil)
 
-	// Capture the user passed to Create
 	var capturedUser *userentity.User
 	s.mockRepo.On("Create", s.ctx, mock.AnythingOfType("*user.User")).Run(func(args mock.Arguments) {
 		capturedUser = args.Get(1).(*userentity.User)
@@ -369,7 +355,6 @@ func (s *CreateUserUseCaseTestSuite) TestCreateUser_PasswordHashing() {
 	assert.True(s.T(), len(capturedUser.PasswordHash) > 20, "bcrypt hash should be long enough")
 }
 
-// TestCreateUser_ContextPropagation tests that context is properly propagated
 func (s *CreateUserUseCaseTestSuite) TestCreateUser_ContextPropagation() {
 	ctxWithValue := context.WithValue(s.ctx, "test-key", "test-value")
 
@@ -382,7 +367,6 @@ func (s *CreateUserUseCaseTestSuite) TestCreateUser_ContextPropagation() {
 	assert.NoError(s.T(), err)
 }
 
-// TestCreateUser_UserIDGeneration tests that user ID is generated
 func (s *CreateUserUseCaseTestSuite) TestCreateUser_UserIDGeneration() {
 	s.mockRepo.On("EmailExists", s.ctx, s.validRequest.Email).Return(false, nil)
 	s.mockRepo.On("UsernameExists", s.ctx, s.validRequest.Username).Return(false, nil)
@@ -399,24 +383,22 @@ func (s *CreateUserUseCaseTestSuite) TestCreateUser_UserIDGeneration() {
 	assert.NotEqual(s.T(), uuid.Nil, capturedUser.ID, "user ID should be generated")
 }
 
-// TestCreateUser_Timestamps tests that timestamps are set correctly
 func (s *CreateUserUseCaseTestSuite) TestCreateUser_Timestamps() {
 	s.mockRepo.On("EmailExists", s.ctx, s.validRequest.Email).Return(false, nil)
 	s.mockRepo.On("UsernameExists", s.ctx, s.validRequest.Username).Return(false, nil)
 
 	var capturedUser *userentity.User
-	beforeTime := time.Now().Add(-time.Millisecond) // Add small buffer
+	beforeTime := time.Now().Add(-time.Millisecond) 
 	s.mockRepo.On("Create", s.ctx, mock.AnythingOfType("*user.User")).Run(func(args mock.Arguments) {
 		capturedUser = args.Get(1).(*userentity.User)
 	}).Return(s.validUser, nil)
-	afterTime := time.Now().Add(time.Millisecond) // Add small buffer
+	afterTime := time.Now().Add(time.Millisecond) 
 
 	_, err := s.useCase.Execute(s.ctx, s.validRequest)
 
 	assert.NoError(s.T(), err)
 	assert.NotNil(s.T(), capturedUser)
 
-	// Use WithinDuration for more reliable time comparisons
 	assert.WithinDuration(s.T(), beforeTime, capturedUser.CreatedAt, 2*time.Second,
 		"created_at should be close to beforeTime")
 	assert.WithinDuration(s.T(), afterTime, capturedUser.CreatedAt, 2*time.Second,
@@ -429,9 +411,7 @@ func (s *CreateUserUseCaseTestSuite) TestCreateUser_Timestamps() {
 		"created_at and updated_at should be equal for new user")
 }
 
-// TestValidatePassword_Fuzzing uses fuzzing to test password validation
 func FuzzValidatePassword(f *testing.F) {
-	// Add seed corpus
 	seedCases := []string{
 		"SecurePass123!",
 		"Short1!",
@@ -451,19 +431,15 @@ func FuzzValidatePassword(f *testing.F) {
 	f.Fuzz(func(t *testing.T, password string) {
 		err := validatePassword(password)
 
-		// If password is valid, error should be nil
-		// If password is invalid, error should be PasswordValidationError
 		if err != nil {
 			var passwordErr *PasswordValidationError
 			assert.True(t, errors.As(err, &passwordErr), "error should be PasswordValidationError")
 			assert.NotEmpty(t, passwordErr.Message)
 
-			// Verify error message contains useful information
 			if len(password) < 8 {
 				assert.Contains(t, passwordErr.Message, "at least")
 				assert.Contains(t, passwordErr.Message, "characters long")
 			} else {
-				// Should mention missing requirements
 				assert.True(t,
 					strings.Contains(passwordErr.Message, "uppercase") ||
 						strings.Contains(passwordErr.Message, "lowercase") ||
@@ -472,10 +448,8 @@ func FuzzValidatePassword(f *testing.F) {
 					"error message should mention missing requirement")
 			}
 		} else {
-			// If no error, password must be valid
 			assert.GreaterOrEqual(t, len(password), 8, "valid password must be at least 8 characters")
 
-			// Check for required character types
 			hasUpper := false
 			hasLower := false
 			hasNumber := false
@@ -504,7 +478,6 @@ func FuzzValidatePassword(f *testing.F) {
 	})
 }
 
-// TestCreateUser_AllErrorScenarios tests all error scenarios with exact error verification
 func (s *CreateUserUseCaseTestSuite) TestCreateUser_AllErrorScenarios() {
 	testCases := []struct {
 		name             string
@@ -560,7 +533,7 @@ func (s *CreateUserUseCaseTestSuite) TestCreateUser_AllErrorScenarios() {
 				Username: "testuser",
 				Password: "Short1!",
 			},
-			expectedError: nil, // Will be PasswordValidationError
+			expectedError: nil, 
 			verifyError: func(t *testing.T, err error) {
 				var passwordErr *PasswordValidationError
 				assert.True(t, errors.As(err, &passwordErr), "should be PasswordValidationError")
@@ -646,7 +619,6 @@ func (s *CreateUserUseCaseTestSuite) TestCreateUser_AllErrorScenarios() {
 
 	for _, tc := range testCases {
 		s.Run(tc.name, func() {
-			// Reset mocks
 			s.mockRepo.ExpectedCalls = nil
 			s.mockRepo.Calls = nil
 
@@ -673,7 +645,6 @@ func (s *CreateUserUseCaseTestSuite) TestCreateUser_AllErrorScenarios() {
 	}
 }
 
-// TestCreateUser_PasswordValidation_Comprehensive tests all password validation edge cases
 func (s *CreateUserUseCaseTestSuite) TestCreateUser_PasswordValidation_Comprehensive() {
 	testCases := []struct {
 		name          string
@@ -681,7 +652,6 @@ func (s *CreateUserUseCaseTestSuite) TestCreateUser_PasswordValidation_Comprehen
 		shouldPass    bool
 		expectedError string
 	}{
-		// Length tests
 		{
 			name:          "password exactly 7 characters",
 			password:      "Pass12!",
@@ -696,12 +666,11 @@ func (s *CreateUserUseCaseTestSuite) TestCreateUser_PasswordValidation_Comprehen
 		},
 		{
 			name:          "password 72 characters (bcrypt max) - valid",
-			password:      "A" + strings.Repeat("a", 69) + "1!", // 1 + 69 + 2 = 72 characters (bcrypt max)
+			password:      "A" + strings.Repeat("a", 69) + "1!", 
 			shouldPass:    true,
 			expectedError: "",
 		},
 
-		// Character type tests
 		{
 			name:          "only uppercase, number, special",
 			password:      "UPPERCASE123!",
@@ -727,7 +696,6 @@ func (s *CreateUserUseCaseTestSuite) TestCreateUser_PasswordValidation_Comprehen
 			expectedError: "special",
 		},
 
-		// Multiple missing requirements
 		{
 			name:          "missing uppercase and number",
 			password:      "lowercaseonly!",
@@ -741,7 +709,6 @@ func (s *CreateUserUseCaseTestSuite) TestCreateUser_PasswordValidation_Comprehen
 			expectedError: "lowercase",
 		},
 
-		// Special character variations
 		{
 			name:          "password with @ symbol",
 			password:      "Pass123@",
@@ -815,11 +782,10 @@ func (s *CreateUserUseCaseTestSuite) TestCreateUser_PasswordValidation_Comprehen
 			expectedError: "",
 		},
 
-		// Edge cases
 		{
 			name:          "password with spaces",
 			password:      "Pass 123!",
-			shouldPass:    true, // Spaces are allowed
+			shouldPass:    true, 
 			expectedError: "",
 		},
 		{
@@ -838,7 +804,6 @@ func (s *CreateUserUseCaseTestSuite) TestCreateUser_PasswordValidation_Comprehen
 
 	for _, tc := range testCases {
 		s.Run(tc.name, func() {
-			// Reset mocks for each test
 			s.mockRepo.ExpectedCalls = nil
 			s.mockRepo.Calls = nil
 
@@ -857,8 +822,6 @@ func (s *CreateUserUseCaseTestSuite) TestCreateUser_PasswordValidation_Comprehen
 			if tc.shouldPass {
 				assert.NoError(s.T(), err, "password should be valid: %s", tc.password)
 				assert.NotEqual(s.T(), uuid.Nil, response.ID, "response should have valid ID")
-				// Note: usecase generates its own UUID, so we just verify it's not nil
-				// The actual ID will be set by the usecase, not from the mock
 			} else {
 				assert.Error(s.T(), err, "password should be invalid: %s", tc.password)
 				var passwordErr *PasswordValidationError
@@ -868,14 +831,12 @@ func (s *CreateUserUseCaseTestSuite) TestCreateUser_PasswordValidation_Comprehen
 						"error message should contain: %s", tc.expectedError)
 				}
 				assert.Equal(s.T(), userdto.CreateUserResponse{}, response)
-				// Verify Create was not called for invalid passwords
 				s.mockRepo.AssertNotCalled(s.T(), "Create", s.ctx, mock.Anything)
 			}
 		})
 	}
 }
 
-// TestCreateUser_PasswordHashing_Verification verifies password hashing properties
 func (s *CreateUserUseCaseTestSuite) TestCreateUser_PasswordHashing_Verification() {
 	testCases := []struct {
 		name     string
@@ -889,7 +850,6 @@ func (s *CreateUserUseCaseTestSuite) TestCreateUser_PasswordHashing_Verification
 
 	for _, tc := range testCases {
 		s.Run(tc.name, func() {
-			// Reset mocks for each test
 			s.mockRepo.ExpectedCalls = nil
 			s.mockRepo.Calls = nil
 
@@ -909,23 +869,18 @@ func (s *CreateUserUseCaseTestSuite) TestCreateUser_PasswordHashing_Verification
 			assert.NoError(s.T(), err)
 			assert.NotNil(s.T(), capturedUser)
 
-			// Verify password is hashed (not plain text)
 			assert.NotEqual(s.T(), tc.password, capturedUser.PasswordHash,
 				"password should be hashed, not stored as plain text")
 
-			// Verify hash format (bcrypt hashes start with $2a$, $2b$, or $2y$)
 			assert.True(s.T(),
 				strings.HasPrefix(capturedUser.PasswordHash, "$2a$") ||
 					strings.HasPrefix(capturedUser.PasswordHash, "$2b$") ||
 					strings.HasPrefix(capturedUser.PasswordHash, "$2y$"),
 				"password hash should be bcrypt format")
 
-			// Verify hash length (bcrypt hashes are 60 characters)
 			assert.Equal(s.T(), 60, len(capturedUser.PasswordHash),
 				"bcrypt hash should be 60 characters long")
 
-			// Verify same password produces different hash (salt)
-			// Reset mocks for second call
 			s.mockRepo.ExpectedCalls = nil
 			s.mockRepo.Calls = nil
 
@@ -941,14 +896,12 @@ func (s *CreateUserUseCaseTestSuite) TestCreateUser_PasswordHashing_Verification
 			assert.NoError(s.T(), err2)
 			assert.NotNil(s.T(), capturedUser2)
 
-			// Hashes should be different due to salt
 			assert.NotEqual(s.T(), capturedUser.PasswordHash, capturedUser2.PasswordHash,
 				"same password should produce different hashes due to salt")
 		})
 	}
 }
 
-// TestCreateUser_ConcurrentExecution tests concurrent execution
 func (s *CreateUserUseCaseTestSuite) TestCreateUser_ConcurrentExecution() {
 	const numGoroutines = 20
 
@@ -999,11 +952,9 @@ func (s *CreateUserUseCaseTestSuite) TestCreateUser_ConcurrentExecution() {
 		}
 	}
 
-	// All should succeed with unique emails/usernames
 	assert.Greater(s.T(), successCount, 0, "at least some requests should succeed")
 }
 
-// Run the test suite
 func TestCreateUserUseCaseTestSuite(t *testing.T) {
 	suite.Run(t, new(CreateUserUseCaseTestSuite))
 }

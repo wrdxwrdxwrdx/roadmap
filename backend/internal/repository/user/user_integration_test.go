@@ -16,10 +16,6 @@ import (
 	"roadmap/internal/infrastructure/database"
 )
 
-// UserRepositoryIntegrationTestSuite is an integration test suite for userRepository
-// These tests require a real database connection
-// Set TEST_DB_DSN environment variable to run these tests
-// Example: TEST_DB_DSN="postgres://user:password@localhost:5432/testdb?sslmode=disable"
 type UserRepositoryIntegrationTestSuite struct {
 	suite.Suite
 	repo *userRepository
@@ -58,12 +54,10 @@ func (s *UserRepositoryIntegrationTestSuite) TearDownSuite() {
 }
 
 func (s *UserRepositoryIntegrationTestSuite) SetupTest() {
-	// Clean up test data before each test
 	s.cleanupTestData()
 }
 
 func (s *UserRepositoryIntegrationTestSuite) TearDownTest() {
-	// Clean up test data after each test
 	s.cleanupTestData()
 }
 
@@ -72,14 +66,12 @@ func (s *UserRepositoryIntegrationTestSuite) cleanupTestData() {
 		return
 	}
 
-	// Delete test users
 	_, err := s.db.Pool.Exec(s.ctx, "DELETE FROM users WHERE email LIKE 'test%@example.com' OR username LIKE 'testuser%'")
 	if err != nil {
 		s.T().Logf("Warning: Failed to cleanup test data: %v", err)
 	}
 }
 
-// TestUserRepository_Create_Success tests successful user creation
 func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_Create_Success() {
 	if s.db == nil {
 		s.T().Skip("Database not available")
@@ -106,7 +98,6 @@ func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_Create_Success()
 	assert.False(s.T(), createdUser.UpdatedAt.IsZero())
 }
 
-// TestUserRepository_Create_DuplicateEmail tests error when email already exists
 func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_Create_DuplicateEmail() {
 	if s.db == nil {
 		s.T().Skip("Database not available")
@@ -124,7 +115,7 @@ func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_Create_Duplicate
 	user2 := &userentity.User{
 		ID:           uuid.New(),
 		Username:     "testuser2",
-		Email:        "duplicate@example.com", // Same email
+		Email:        "duplicate@example.com", 
 		PasswordHash: "$2a$10$testhash2",
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
@@ -138,7 +129,6 @@ func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_Create_Duplicate
 	assert.Contains(s.T(), err2.Error(), "duplicate key")
 }
 
-// TestUserRepository_GetByID_Success tests successful user retrieval by ID
 func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_GetByID_Success() {
 	if s.db == nil {
 		s.T().Skip("Database not available")
@@ -165,7 +155,6 @@ func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_GetByID_Success(
 	assert.Equal(s.T(), createdUser.PasswordHash, retrievedUser.PasswordHash)
 }
 
-// TestUserRepository_GetByID_NotFound tests error when user not found
 func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_GetByID_NotFound() {
 	if s.db == nil {
 		s.T().Skip("Database not available")
@@ -178,7 +167,6 @@ func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_GetByID_NotFound
 	assert.Contains(s.T(), err.Error(), "user not found")
 }
 
-// TestUserRepository_GetByEmail_Success tests successful user retrieval by email
 func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_GetByEmail_Success() {
 	if s.db == nil {
 		s.T().Skip("Database not available")
@@ -204,7 +192,6 @@ func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_GetByEmail_Succe
 	assert.Equal(s.T(), createdUser.Email, retrievedUser.Email)
 }
 
-// TestUserRepository_GetByEmail_NotFound tests error when user not found by email
 func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_GetByEmail_NotFound() {
 	if s.db == nil {
 		s.T().Skip("Database not available")
@@ -216,7 +203,6 @@ func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_GetByEmail_NotFo
 	assert.Contains(s.T(), err.Error(), "user not found")
 }
 
-// TestUserRepository_EmailExists_True tests when email exists
 func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_EmailExists_True() {
 	if s.db == nil {
 		s.T().Skip("Database not available")
@@ -240,7 +226,6 @@ func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_EmailExists_True
 	assert.True(s.T(), exists)
 }
 
-// TestUserRepository_EmailExists_False tests when email does not exist
 func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_EmailExists_False() {
 	if s.db == nil {
 		s.T().Skip("Database not available")
@@ -252,7 +237,6 @@ func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_EmailExists_Fals
 	assert.False(s.T(), exists)
 }
 
-// TestUserRepository_UsernameExists_True tests when username exists
 func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_UsernameExists_True() {
 	if s.db == nil {
 		s.T().Skip("Database not available")
@@ -276,7 +260,6 @@ func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_UsernameExists_T
 	assert.True(s.T(), exists)
 }
 
-// TestUserRepository_UsernameExists_False tests when username does not exist
 func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_UsernameExists_False() {
 	if s.db == nil {
 		s.T().Skip("Database not available")
@@ -288,13 +271,11 @@ func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_UsernameExists_F
 	assert.False(s.T(), exists)
 }
 
-// TestUserRepository_ConcurrentAccess tests concurrent access to repository
 func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_ConcurrentAccess() {
 	if s.db == nil {
 		s.T().Skip("Database not available")
 	}
 
-	// Create multiple users concurrently
 	userCount := 10
 	errors := make(chan error, userCount)
 
@@ -313,7 +294,6 @@ func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_ConcurrentAccess
 		}(i)
 	}
 
-	// Collect errors
 	var errorCount int
 	for i := 0; i < userCount; i++ {
 		if err := <-errors; err != nil {
@@ -321,11 +301,9 @@ func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_ConcurrentAccess
 		}
 	}
 
-	// All should succeed (assuming no duplicates)
 	assert.Equal(s.T(), 0, errorCount)
 }
 
-// TestUserRepository_Create_ErrorHandling tests all error scenarios
 func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_Create_ErrorHandling() {
 	if s.db == nil {
 		s.T().Skip("Database not available")
@@ -354,7 +332,7 @@ func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_Create_ErrorHand
 				return &userentity.User{
 					ID:           uuid.New(),
 					Username:     "uniqueuser2",
-					Email:        "duplicate_email@example.com", // Same email
+					Email:        "duplicate_email@example.com", 
 					PasswordHash: "$2a$10$testhash2",
 					CreatedAt:    time.Now(),
 					UpdatedAt:    time.Now(),
@@ -382,7 +360,7 @@ func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_Create_ErrorHand
 
 				return &userentity.User{
 					ID:           uuid.New(),
-					Username:     "duplicate_username", // Same username
+					Username:     "duplicate_username", 
 					Email:        "unique2@example.com",
 					PasswordHash: "$2a$10$testhash2",
 					CreatedAt:    time.Now(),
@@ -411,7 +389,6 @@ func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_Create_ErrorHand
 		s.Run(tc.name, func() {
 			user := tc.setupUser()
 			if user == nil {
-				// Test nil user case
 				_, err := s.repo.Create(s.ctx, nil)
 				if tc.expectError {
 					assert.Error(s.T(), err)
@@ -436,7 +413,6 @@ func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_Create_ErrorHand
 	}
 }
 
-// TestUserRepository_GetByID_ErrorHandling tests error scenarios for GetByID
 func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_GetByID_ErrorHandling() {
 	if s.db == nil {
 		s.T().Skip("Database not available")
@@ -451,7 +427,7 @@ func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_GetByID_ErrorHan
 		{
 			name: "non-existent ID returns not found error",
 			setupID: func() uuid.UUID {
-				return uuid.New() // Random non-existent ID
+				return uuid.New() 
 			},
 			expectError: true,
 			errorCheck: func(t *testing.T, err error) {
@@ -488,7 +464,6 @@ func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_GetByID_ErrorHan
 	}
 }
 
-// TestUserRepository_GetByEmail_ErrorHandling tests error scenarios for GetByEmail
 func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_GetByEmail_ErrorHandling() {
 	if s.db == nil {
 		s.T().Skip("Database not available")
@@ -543,7 +518,6 @@ func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_GetByEmail_Error
 	}
 }
 
-// TestUserRepository_EmailExists_EdgeCases tests edge cases for EmailExists
 func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_EmailExists_EdgeCases() {
 	if s.db == nil {
 		s.T().Skip("Database not available")
@@ -565,7 +539,7 @@ func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_EmailExists_Edge
 			name:      "case sensitive email check",
 			email:     "Test@Example.com",
 			setupUser: true,
-			expected:  false, // Email is case-sensitive in database
+			expected:  false, 
 		},
 		{
 			name:      "email with special characters",
@@ -603,7 +577,6 @@ func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_EmailExists_Edge
 	}
 }
 
-// TestUserRepository_UsernameExists_EdgeCases tests edge cases for UsernameExists
 func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_UsernameExists_EdgeCases() {
 	if s.db == nil {
 		s.T().Skip("Database not available")
@@ -625,7 +598,7 @@ func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_UsernameExists_E
 			name:      "case sensitive username check",
 			username:  "TestUser",
 			setupUser: true,
-			expected:  false, // Username is case-sensitive
+			expected:  false, 
 		},
 		{
 			name:      "username with numbers",
@@ -669,7 +642,6 @@ func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_UsernameExists_E
 	}
 }
 
-// TestUserRepository_DataIntegrity tests data integrity and consistency
 func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_DataIntegrity() {
 	if s.db == nil {
 		s.T().Skip("Database not available")
@@ -684,11 +656,9 @@ func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_DataIntegrity() 
 		UpdatedAt:    time.Now(),
 	}
 
-	// Create user
 	createdUser, err := s.repo.Create(s.ctx, user)
 	require.NoError(s.T(), err)
 
-	// Verify all fields are preserved
 	assert.Equal(s.T(), user.ID, createdUser.ID)
 	assert.Equal(s.T(), user.Username, createdUser.Username)
 	assert.Equal(s.T(), user.Email, createdUser.Email)
@@ -696,33 +666,28 @@ func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_DataIntegrity() 
 	assert.WithinDuration(s.T(), user.CreatedAt, createdUser.CreatedAt, time.Second)
 	assert.WithinDuration(s.T(), user.UpdatedAt, createdUser.UpdatedAt, time.Second)
 
-	// Retrieve by ID and verify
 	retrievedByID, err := s.repo.GetByID(s.ctx, createdUser.ID)
 	require.NoError(s.T(), err)
 	assert.Equal(s.T(), createdUser.ID, retrievedByID.ID)
 	assert.Equal(s.T(), createdUser.Username, retrievedByID.Username)
 	assert.Equal(s.T(), createdUser.Email, retrievedByID.Email)
 
-	// Retrieve by email and verify
 	retrievedByEmail, err := s.repo.GetByEmail(s.ctx, createdUser.Email)
 	require.NoError(s.T(), err)
 	assert.Equal(s.T(), createdUser.ID, retrievedByEmail.ID)
 	assert.Equal(s.T(), createdUser.Username, retrievedByEmail.Username)
 	assert.Equal(s.T(), createdUser.Email, retrievedByEmail.Email)
 
-	// Verify consistency between retrieval methods
 	assert.Equal(s.T(), retrievedByID.ID, retrievedByEmail.ID)
 	assert.Equal(s.T(), retrievedByID.Username, retrievedByEmail.Username)
 	assert.Equal(s.T(), retrievedByID.Email, retrievedByEmail.Email)
 }
 
-// TestUserRepository_TransactionIsolation tests transaction isolation
 func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_TransactionIsolation() {
 	if s.db == nil {
 		s.T().Skip("Database not available")
 	}
 
-	// This test verifies that operations are properly isolated
 	user1 := &userentity.User{
 		ID:           uuid.New(),
 		Username:     "isolation_user1",
@@ -741,19 +706,16 @@ func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_TransactionIsola
 		UpdatedAt:    time.Now(),
 	}
 
-	// Create both users
 	created1, err1 := s.repo.Create(s.ctx, user1)
 	require.NoError(s.T(), err1)
 
 	created2, err2 := s.repo.Create(s.ctx, user2)
 	require.NoError(s.T(), err2)
 
-	// Verify they are independent
 	assert.NotEqual(s.T(), created1.ID, created2.ID)
 	assert.NotEqual(s.T(), created1.Username, created2.Username)
 	assert.NotEqual(s.T(), created1.Email, created2.Email)
 
-	// Verify each can be retrieved independently
 	retrieved1, err := s.repo.GetByID(s.ctx, created1.ID)
 	require.NoError(s.T(), err)
 	assert.Equal(s.T(), created1.ID, retrieved1.ID)
@@ -763,7 +725,6 @@ func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_TransactionIsola
 	assert.Equal(s.T(), created2.ID, retrieved2.ID)
 }
 
-// Run the integration test suite
 func TestUserRepositoryIntegrationTestSuite(t *testing.T) {
 	suite.Run(t, new(UserRepositoryIntegrationTestSuite))
 }
