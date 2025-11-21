@@ -15,17 +15,14 @@ import (
 	userentity "roadmap/internal/domain/entities/user"
 )
 
-// MockDatabase is a mock implementation of database connection
 type MockDatabase struct {
 	mock.Mock
 }
 
-// MockPool is a mock implementation of pgx pool
 type MockPool struct {
 	mock.Mock
 }
 
-// MockRow is a mock implementation of pgx.Row
 type MockRow struct {
 	mock.Mock
 	values []interface{}
@@ -43,7 +40,6 @@ func (m *MockRow) Scan(dest ...interface{}) error {
 		if destPtr, ok := dest[i].(*interface{}); ok {
 			*destPtr = val
 		} else {
-			// Try to assign directly
 			switch d := dest[i].(type) {
 			case *uuid.UUID:
 				if uuidVal, ok := val.(uuid.UUID); ok {
@@ -67,9 +63,6 @@ func (m *MockRow) Scan(dest ...interface{}) error {
 	return nil
 }
 
-// UserRepositoryTestSuite is a test suite for userRepository
-// Note: This is a unit test suite using mocks
-// For integration tests, you would need a test database
 type UserRepositoryTestSuite struct {
 	suite.Suite
 	repo     *userRepository
@@ -91,97 +84,67 @@ func (s *UserRepositoryTestSuite) SetupTest() {
 	}
 }
 
-// TestNewUserRepository tests repository creation
 func TestNewUserRepository(t *testing.T) {
-	// This test would require a real database connection
-	// For unit testing, we test the structure
 	repo := &userRepository{}
 	assert.NotNil(t, repo)
 }
 
-// TestUserRepository_Create_Success tests successful user creation
 func (s *UserRepositoryTestSuite) TestUserRepository_Create_Success() {
-	// Note: This is a simplified test
-	// Full integration test would require a test database
-	// Here we test the query structure and error handling logic
 
-	// This test documents the expected behavior
-	// Actual implementation would need database connection
 	assert.NotNil(s.T(), s.testUser)
 	assert.NotEqual(s.T(), uuid.Nil, s.testUser.ID)
 }
 
-// TestUserRepository_GetByID_Success tests successful user retrieval by ID
 func (s *UserRepositoryTestSuite) TestUserRepository_GetByID_Success() {
-	// Document expected behavior
 	testID := uuid.New()
 	assert.NotEqual(s.T(), uuid.Nil, testID)
 }
 
-// TestUserRepository_GetByID_NotFound tests error when user not found
 func (s *UserRepositoryTestSuite) TestUserRepository_GetByID_NotFound() {
-	// Document expected behavior - should return pgx.ErrNoRows wrapped error
 	expectedError := pgx.ErrNoRows
 	assert.True(s.T(), errors.Is(expectedError, pgx.ErrNoRows))
 }
 
-// TestUserRepository_GetByEmail_Success tests successful user retrieval by email
 func (s *UserRepositoryTestSuite) TestUserRepository_GetByEmail_Success() {
-	// Document expected behavior
 	testEmail := "test@example.com"
 	assert.NotEmpty(s.T(), testEmail)
 }
 
-// TestUserRepository_GetByEmail_NotFound tests error when user not found by email
 func (s *UserRepositoryTestSuite) TestUserRepository_GetByEmail_NotFound() {
-	// Document expected behavior - should return pgx.ErrNoRows wrapped error
 	expectedError := pgx.ErrNoRows
 	assert.True(s.T(), errors.Is(expectedError, pgx.ErrNoRows))
 }
 
-// TestUserRepository_EmailExists_True tests when email exists
 func (s *UserRepositoryTestSuite) TestUserRepository_EmailExists_True() {
-	// Document expected behavior
 	testEmail := "existing@example.com"
 	assert.NotEmpty(s.T(), testEmail)
 }
 
-// TestUserRepository_EmailExists_False tests when email does not exist
 func (s *UserRepositoryTestSuite) TestUserRepository_EmailExists_False() {
-	// Document expected behavior
 	testEmail := "nonexistent@example.com"
 	assert.NotEmpty(s.T(), testEmail)
 }
 
-// TestUserRepository_EmailExists_Error tests error from database
 func (s *UserRepositoryTestSuite) TestUserRepository_EmailExists_Error() {
-	// Document expected behavior - should return wrapped error
 	dbError := errors.New("database connection error")
 	assert.Error(s.T(), dbError)
 }
 
-// TestUserRepository_UsernameExists_True tests when username exists
 func (s *UserRepositoryTestSuite) TestUserRepository_UsernameExists_True() {
-	// Document expected behavior
 	testUsername := "existinguser"
 	assert.NotEmpty(s.T(), testUsername)
 }
 
-// TestUserRepository_UsernameExists_False tests when username does not exist
 func (s *UserRepositoryTestSuite) TestUserRepository_UsernameExists_False() {
-	// Document expected behavior
 	testUsername := "nonexistentuser"
 	assert.NotEmpty(s.T(), testUsername)
 }
 
-// TestUserRepository_UsernameExists_Error tests error from database
 func (s *UserRepositoryTestSuite) TestUserRepository_UsernameExists_Error() {
-	// Document expected behavior - should return wrapped error
 	dbError := errors.New("database connection error")
 	assert.Error(s.T(), dbError)
 }
 
-// TestUserRepository_ErrorWrapping tests that errors are properly wrapped
 func (s *UserRepositoryTestSuite) TestUserRepository_ErrorWrapping() {
 	originalError := errors.New("original error")
 	wrappedError := errors.New("failed to create user: " + originalError.Error())
@@ -191,10 +154,7 @@ func (s *UserRepositoryTestSuite) TestUserRepository_ErrorWrapping() {
 	assert.Contains(s.T(), wrappedError.Error(), "original error")
 }
 
-// TestUserRepository_QueryStructure tests query structure
 func TestUserRepository_QueryStructure(t *testing.T) {
-	// Test that queries are properly structured
-	// These tests verify the SQL query patterns
 
 	tests := []struct {
 		name  string
@@ -255,12 +215,9 @@ func TestUserRepository_QueryStructure(t *testing.T) {
 	}
 }
 
-// TestUserRepository_ScanOrder tests that scan order matches query order
 func TestUserRepository_ScanOrder(t *testing.T) {
-	// Verify that scan order matches SELECT order
 	expectedOrder := []string{"id", "email", "password_hash", "username", "created_at", "updated_at"}
 
-	// This test documents the expected scan order
 	assert.Equal(t, 6, len(expectedOrder))
 	assert.Equal(t, "id", expectedOrder[0])
 	assert.Equal(t, "email", expectedOrder[1])
@@ -270,7 +227,6 @@ func TestUserRepository_ScanOrder(t *testing.T) {
 	assert.Equal(t, "updated_at", expectedOrder[5])
 }
 
-// TestUserRepository_ErrorMessages tests error message format
 func TestUserRepository_ErrorMessages(t *testing.T) {
 	tests := []struct {
 		name        string
@@ -311,9 +267,7 @@ func TestUserRepository_ErrorMessages(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Verify error message format
 			assert.NotEmpty(t, tt.expectedMsg)
-			// Most error messages contain "failed", except "user not found"
 			if tt.operation != "not found" {
 				assert.Contains(t, tt.expectedMsg, "failed",
 					"error message should contain 'failed' for operation: %s", tt.operation)
@@ -325,9 +279,7 @@ func TestUserRepository_ErrorMessages(t *testing.T) {
 	}
 }
 
-// TestUserRepository_ContextPropagation tests that context is used
 func (s *UserRepositoryTestSuite) TestUserRepository_ContextPropagation() {
-	// Document that context should be passed to database operations
 	ctx := context.Background()
 	assert.NotNil(s.T(), ctx)
 
@@ -335,7 +287,6 @@ func (s *UserRepositoryTestSuite) TestUserRepository_ContextPropagation() {
 	assert.NotNil(s.T(), ctxWithValue)
 }
 
-// Run the test suite
 func TestUserRepositoryTestSuite(t *testing.T) {
 	suite.Run(t, new(UserRepositoryTestSuite))
 }

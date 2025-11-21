@@ -1,5 +1,8 @@
 .PHONY: up down build rebuild logs ps clean db-shell db-tables db-describe db-size db-tables-size db-info restart-api logs-api logs-db wait-health test test-short test-verbose test-coverage test-unit test-integration
 
+# Coverage threshold (minimum required coverage percentage)
+COVERAGE_THRESHOLD ?= 65.0
+
 # Start all services
 up:
 	docker-compose up -d
@@ -107,21 +110,39 @@ test:
 
 # Run tests and show short summary (one line)
 test-short:
-	@cd backend && go test ./... -json 2>&1 | \
+	@cd backend && \
+	go test ./... -json -coverprofile=coverage.out 2>&1 | \
 	awk 'BEGIN {passed=0; failed=0} \
 		/"Action":"pass"/ {passed++} \
 		/"Action":"fail"/ {failed++} \
 		END { \
 			total=passed+failed; \
 			if (failed > 0) { \
-				printf "Tests: %d/%d passed, %d failed\n", passed, total, failed; \
+				printf "Tests: %d/%d passed, %d failed", passed, total, failed; \
 				exit 1; \
 			} else if (total > 0) { \
-				printf "Tests: %d/%d passed\n", passed, total; \
+				printf "Tests: %d/%d passed", passed, total; \
 			} else { \
-				printf "No tests found\n"; \
+				printf "No tests found"; \
 			} \
-		}'
+		}' && \
+	coverage=$$(go tool cover -func=coverage.out 2>/dev/null | tail -1 | awk '{print $$3}' | sed 's/%//') && \
+	if [ -n "$$coverage" ]; then \
+		coverage_num=$$(echo "$$coverage" | awk '{print $$1}'); \
+		threshold=$(COVERAGE_THRESHOLD); \
+		if [ -n "$$coverage_num" ] && [ -n "$$threshold" ]; then \
+			status=$$(echo "$$coverage_num >= $$threshold" | bc -l 2>/dev/null || echo "0"); \
+			if [ "$$status" = "1" ]; then \
+				echo " | Coverage: $$coverage% (target: $$threshold% ✓)"; \
+			else \
+				echo " | Coverage: $$coverage% (target: $$threshold% ✗)"; \
+			fi; \
+		else \
+			echo " | Coverage: $$coverage% (target: $$threshold%)"; \
+		fi; \
+	else \
+		echo ""; \
+	fi
 
 # Run tests with verbose output
 test-verbose:

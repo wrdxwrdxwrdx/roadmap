@@ -2,12 +2,16 @@ package main
 
 import (
 	"log"
+	"os"
 	"roadmap/internal/handler"
 	"roadmap/internal/handler/middleware"
 	userhandler "roadmap/internal/handler/user"
 	"roadmap/internal/infrastructure/database"
+	jwtservice "roadmap/internal/pkg/jwt"
 	userrepo "roadmap/internal/repository/user"
 	userusecase "roadmap/internal/usecase/user"
+	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -29,6 +33,29 @@ func initDatabase() *database.Database {
 	return db
 }
 
+func initJWT() *jwtservice.JWTService {
+	secretKey := getEnv("JWT_SECRET_KEY", "your-secret-key-change-in-production")
+	expiresInHoursStr := getEnv("JWT_EXPIRES_IN_HOURS", "24")
+
+	expiresInHours, err := strconv.Atoi(expiresInHoursStr)
+	if err != nil || expiresInHours <= 0 {
+		log.Printf("Invalid JWT_EXPIRES_IN_HOURS value '%s', using default 24 hours", expiresInHoursStr)
+		expiresInHours = 24
+	}
+
+	expiresIn := time.Duration(expiresInHours) * time.Hour
+
+	log.Printf("JWT service initialized with expiration: %d hours", expiresInHours)
+	return jwtservice.NewJWTService(secretKey, expiresIn)
+}
+
+func getEnv(key, defaultValue string) string {
+	if value := os.Getenv(key); value != "" {
+		return value
+	}
+	return defaultValue
+}
+
 func main() {
 	db := initDatabase()
 	defer db.Close()
@@ -39,13 +66,19 @@ func main() {
 
 	userRepository := userrepo.NewUserRepository(db)
 
-	createUserUseCase := userusecase.NewCreateUserUseCase(userRepository)
+	jwtService := initJWT()
 
-	userHandler := userhandler.NewUserHandler(createUserUseCase)
+	createUserUseCase := userusecase.NewCreateUserUseCase(userRepository)
+	registerUseCase := userusecase.NewRegisterUseCase(userRepository, jwtService)
+	loginUseCase := userusecase.NewLoginUseCase(userRepository, jwtService)
+
+	userHandler := userhandler.NewUserHandler(createUserUseCase, registerUseCase, loginUseCase)
+
+	authMiddleware := middleware.AuthMiddleware(jwtService)
 
 	api := router.Group("/api/v1")
 	{
-		userhandler.SetupUserRoutes(api, userHandler)
+		userhandler.SetupUserRoutes(api, userHandler, authMiddleware)
 	}
 
 	router.GET("/health", handler.HealthHandler)
