@@ -388,11 +388,11 @@ func (s *CreateUserUseCaseTestSuite) TestCreateUser_Timestamps() {
 	s.mockRepo.On("UsernameExists", s.ctx, s.validRequest.Username).Return(false, nil)
 
 	var capturedUser *userentity.User
-	beforeTime := time.Now().Add(-time.Millisecond) 
+	beforeTime := time.Now().Add(-time.Millisecond)
 	s.mockRepo.On("Create", s.ctx, mock.AnythingOfType("*user.User")).Run(func(args mock.Arguments) {
 		capturedUser = args.Get(1).(*userentity.User)
 	}).Return(s.validUser, nil)
-	afterTime := time.Now().Add(time.Millisecond) 
+	afterTime := time.Now().Add(time.Millisecond)
 
 	_, err := s.useCase.Execute(s.ctx, s.validRequest)
 
@@ -533,7 +533,7 @@ func (s *CreateUserUseCaseTestSuite) TestCreateUser_AllErrorScenarios() {
 				Username: "testuser",
 				Password: "Short1!",
 			},
-			expectedError: nil, 
+			expectedError: nil,
 			verifyError: func(t *testing.T, err error) {
 				var passwordErr *PasswordValidationError
 				assert.True(t, errors.As(err, &passwordErr), "should be PasswordValidationError")
@@ -666,7 +666,7 @@ func (s *CreateUserUseCaseTestSuite) TestCreateUser_PasswordValidation_Comprehen
 		},
 		{
 			name:          "password 72 characters (bcrypt max) - valid",
-			password:      "A" + strings.Repeat("a", 69) + "1!", 
+			password:      "A" + strings.Repeat("a", 69) + "1!",
 			shouldPass:    true,
 			expectedError: "",
 		},
@@ -785,7 +785,7 @@ func (s *CreateUserUseCaseTestSuite) TestCreateUser_PasswordValidation_Comprehen
 		{
 			name:          "password with spaces",
 			password:      "Pass 123!",
-			shouldPass:    true, 
+			shouldPass:    true,
 			expectedError: "",
 		},
 		{

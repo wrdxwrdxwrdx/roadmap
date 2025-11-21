@@ -50,4 +50,3 @@ func TestRecoveryMiddleware_NoPanic(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, w.Code)
 }
-

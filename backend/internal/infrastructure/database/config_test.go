@@ -89,4 +89,3 @@ func TestGetEnv_WithDefault(t *testing.T) {
 	value := getEnv("TEST_KEY", "default-value")
 	assert.Equal(t, "default-value", value)
 }
-
