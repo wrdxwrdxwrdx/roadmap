@@ -8,20 +8,20 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 
-	userusecase "roadmap/internal/usecase/user"
 	jwtservice "roadmap/internal/pkg/jwt"
+	userusecase "roadmap/internal/usecase/user"
 )
 
 func TestSetupUserRoutes(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	router := gin.New()
-	
+
 	// Create real use cases with nil repositories (they won't be called in this test)
 	createUseCase := userusecase.NewCreateUserUseCase(nil)
 	registerUseCase := userusecase.NewRegisterUseCase(nil, jwtservice.NewJWTService("test-secret", 24*3600*1000000000))
 	loginUseCase := userusecase.NewLoginUseCase(nil, jwtservice.NewJWTService("test-secret", 24*3600*1000000000))
-	
+
 	handler := NewUserHandler(createUseCase, registerUseCase, loginUseCase)
 	authMiddleware := func(c *gin.Context) {
 		c.Set("user_id", "test-user-id")
@@ -56,4 +56,3 @@ func TestSetupUserRoutes(t *testing.T) {
 	// Should be 200 OK because auth middleware sets user_id
 	assert.Equal(t, http.StatusOK, w.Code, "profile route should work with auth")
 }
-

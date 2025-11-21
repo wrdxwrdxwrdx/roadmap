@@ -45,4 +45,3 @@ func TestErrors_Is(t *testing.T) {
 	assert.False(t, errors.Is(ErrEmailAlreadyExists, ErrUsernameAlreadyExists))
 	assert.False(t, errors.Is(ErrEmailAlreadyExists, ErrInvalidCredentials))
 }
-

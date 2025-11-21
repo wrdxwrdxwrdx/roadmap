@@ -30,4 +30,3 @@ func TestHealthHandler(t *testing.T) {
 	assert.Equal(t, "ok", response["status"])
 	assert.Equal(t, "roadmap-api", response["service"])
 }
-

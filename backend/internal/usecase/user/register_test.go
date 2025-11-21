@@ -176,4 +176,3 @@ func (s *RegisterUseCaseTestSuite) TestRegister_JWTGenerationError() {
 func TestRegisterUseCaseTestSuite(t *testing.T) {
 	suite.Run(t, new(RegisterUseCaseTestSuite))
 }
-
