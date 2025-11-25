@@ -290,6 +290,7 @@ workflow:
 	@echo ""
 	@echo "Note: To install golangci-lint for full linting:"
 	@echo "  go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest"
+
 # Show help message with all available commands
 help:
 	@echo "Available commands:"
