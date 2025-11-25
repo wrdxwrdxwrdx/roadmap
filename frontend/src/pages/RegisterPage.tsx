@@ -1,5 +1,5 @@
 import { useState, FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useApi } from '../hooks/useApi'
 import { apiEndpoints } from '../services/apiEndpoints'
@@ -22,7 +22,6 @@ interface RegisterResponse {
 
 function RegisterPage() {
   const { t } = useTranslation()
-  const navigate = useNavigate()
   const [formData, setFormData] = useState<RegisterFormData>({
     email: '',
     username: '',
@@ -33,12 +32,9 @@ function RegisterPage() {
   const [touched, setTouched] = useState<Partial<Record<keyof RegisterFormData, boolean>>>({})
 
   // Используем useApi для регистрации
-  const { data, loading, error, execute } = useApi<RegisterResponse>(
-    () => apiEndpoints.register({
-      email: formData.email,
-      username: formData.username,
-      password: formData.password,
-    })
+  const { data, loading, error, execute, reset } = useApi<RegisterResponse>(
+    (registerData: { email: string; username: string; password: string }) => 
+      apiEndpoints.register(registerData)
   )
 
   const validateField = (name: keyof RegisterFormData, value: string): string => {
@@ -111,15 +107,19 @@ function RegisterPage() {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     
+    // Сбрасываем предыдущие ошибки и успешные сообщения
+    reset()
+    
     if (!validateForm()) {
       return
     }
 
     try {
-      await execute()
-      // После успешной регистрации перенаправляем на главную страницу
-      // В будущем можно добавить автоматический вход
-      navigate('/')
+      await execute({
+        email: formData.email,
+        username: formData.username,
+        password: formData.password,
+      })
     } catch (err) {
       // Ошибка уже обработана в useApi
       console.error('Registration error:', err)
@@ -318,16 +318,21 @@ function RegisterPage() {
             )}
           </div>
 
-          {/* Error message from API */}
+          {/* Error message from API - красное окно */}
           {error && !loading && (
             <div style={{
-              padding: 'var(--spacing-sm)',
-              backgroundColor: 'rgba(220, 53, 69, 0.1)',
-              border: '1px solid var(--color-error)',
+              padding: 'var(--spacing-md)',
+              backgroundColor: 'rgba(220, 53, 69, 0.15)',
+              border: '2px solid #dc3545',
               borderRadius: 'var(--radius-md)',
-              color: 'var(--color-error)',
-              fontSize: '0.875rem',
+              color: '#dc3545',
+              fontSize: '0.9rem',
+              fontWeight: 500,
+              marginTop: 'var(--spacing-sm)',
             }}>
+              <strong style={{ display: 'block', marginBottom: 'var(--spacing-xs)' }}>
+                {t('register.error')}
+              </strong>
               {(() => {
                 if (error.response?.data) {
                   const errorData = error.response.data as any
@@ -340,17 +345,22 @@ function RegisterPage() {
             </div>
           )}
 
-          {/* Success message */}
+          {/* Success message - зеленое окно */}
           {data && !loading && !error && (
             <div style={{
-              padding: 'var(--spacing-sm)',
-              backgroundColor: 'rgba(40, 167, 69, 0.1)',
-              border: '1px solid var(--color-success)',
+              padding: 'var(--spacing-md)',
+              backgroundColor: 'rgba(40, 167, 69, 0.15)',
+              border: '2px solid #28a745',
               borderRadius: 'var(--radius-md)',
-              color: 'var(--color-success)',
-              fontSize: '0.875rem',
+              color: '#28a745',
+              fontSize: '0.9rem',
+              fontWeight: 500,
+              marginTop: 'var(--spacing-sm)',
             }}>
+              <strong style={{ display: 'block', marginBottom: 'var(--spacing-xs)' }}>
               {t('register.success')}
+              </strong>
+              {data.message || t('register.success')}
             </div>
           )}
 
