@@ -2,6 +2,7 @@
 
 COVERAGE_THRESHOLD ?= 50.0
 
+# Start all services (production)
 up:
 	docker-compose up -d --build
 	@echo "Waiting for services to be healthy..."
