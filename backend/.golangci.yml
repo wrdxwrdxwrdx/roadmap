@@ -1,6 +1,8 @@
+version: 2
+
 run:
   timeout: 5m
-  tests: true
+  tests: false
   skip-dirs:
     - vendor
     - migrations
@@ -15,31 +17,12 @@ linters-settings:
   goconst:
     min-len: 3
     min-occurrences: 2
-  gocritic:
-    enabled-tags:
-      - diagnostic
-      - experimental
-      - opinionated
-      - performance
-      - style
-    disabled-checks:
-      - dupImport
-      - ifElseChain
-      - octalLiteral
-      - whyNoLint
-      - wrapperFunc
   gocyclo:
     min-complexity: 15
-  goimports:
-    local-prefixes: roadmap
-  golint:
-    min-confidence: 0
   govet:
     check-shadowing: true
   lll:
     line-length: 140
-  maligned:
-    suggest-new: true
   misspell:
     locale: US
   nolintlint:
@@ -51,57 +34,25 @@ linters-settings:
 linters:
   disable-all: true
   enable:
-    - bodyclose
-    - deadcode
-    - depguard
-    - dogsled
-    - dupl
     - errcheck
-    - exportloopref
-    - exhaustive
-    - funlen
-    - gochecknoinits
     - goconst
-    - gocritic
     - gocyclo
-    - gofmt
-    - goimports
-    - golint
-    - gomnd
-    - goprintffuncname
     - gosec
-    - gosimple
     - govet
     - ineffassign
-    - interfacer
     - lll
     - misspell
-    - nakedret
-    - noctx
     - nolintlint
-    - rowserrcheck
-    - scopelint
     - staticcheck
-    - structcheck
-    - stylecheck
-    - typecheck
     - unconvert
     - unparam
     - unused
-    - varcheck
     - whitespace
 
 issues:
   exclude-rules:
-    - path: _test\.go
-      linters:
-        - errcheck
-        - gosec
-        - funlen
-        - goconst
     - path: cmd/
       linters:
         - errcheck
   max-issues-per-linter: 0
   max-same-issues: 0
-

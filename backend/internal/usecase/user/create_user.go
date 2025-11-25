@@ -20,7 +20,10 @@ func NewCreateUserUseCase(userRepository userrepo.UserRepository) *CreateUserUse
 	return &CreateUserUseCase{userRepository: userRepository}
 }
 
-func (u *CreateUserUseCase) Execute(ctx context.Context, req userdto.CreateUserRequest) (userdto.CreateUserResponse, error) {
+func (u *CreateUserUseCase) Execute(
+	ctx context.Context,
+	req userdto.CreateUserRequest,
+) (userdto.CreateUserResponse, error) {
 	emailExists, err := u.userRepository.EmailExists(ctx, req.Email)
 	if err != nil {
 		return userdto.CreateUserResponse{}, err

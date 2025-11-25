@@ -120,8 +120,8 @@ func (h *UserHandler) Login(c *gin.Context) {
 
 	response, err := h.loginUseCase.Execute(c.Request.Context(), req)
 	if err != nil {
-		statusCode := http.StatusUnauthorized
-		errorMessage := "Invalid email or password"
+		var statusCode int
+		var errorMessage string
 
 		if errors.Is(err, userusecase.ErrInvalidCredentials) {
 			statusCode = http.StatusUnauthorized
