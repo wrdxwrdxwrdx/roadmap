@@ -2,6 +2,7 @@
 
 COVERAGE_THRESHOLD ?= 50.0
 
+>>>>>>> d064e7a (fix: golint + test coverage)
 COVERAGE_THRESHOLD ?= 50.0
 
 up:
