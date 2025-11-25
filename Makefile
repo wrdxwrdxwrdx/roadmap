@@ -2,7 +2,7 @@
 
 # Start all services (production)
 up:
-	docker-compose up -d
+	docker-compose up -d --build
 	@echo "Waiting for services to be healthy..."
 	@make wait-health
 	@echo "✓ All services are up!"

@@ -1,0 +1,115 @@
+{
+  "common": {
+    "appName": "Roadmap",
+    "welcome": "Welcome to the application!",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "actions": "Actions"
+  },
+  "navigation": {
+    "home": "Home",
+    "register": "Register",
+    "login": "Login",
+    "logout": "Logout",
+    "profile": "Profile",
+    "settings": "Settings"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "toggle": "Toggle theme",
+    "current": "Current theme"
+  },
+  "language": {
+    "title": "Language",
+    "english": "English",
+    "russian": "Русский",
+    "switch": "Switch language"
+  },
+  "home": {
+    "title": "Roadmap Frontend",
+    "demoTitle": "Demonstration of configured tools:",
+    "theme": {
+      "title": "1. Theme System",
+      "current": "Current theme",
+      "description": "Theme is switched via button in header. Changes are applied to the entire application automatically."
+    },
+    "api": {
+      "title": "2. Axios HTTP Client",
+      "description": "Click the button below to check connection to backend API",
+      "checkButton": "Check API Health",
+      "checking": "Checking...",
+      "sending": "⏳ Sending request to API...",
+      "error": {
+        "title": "❌ Connection Error",
+        "message": "Message",
+        "httpStatus": "HTTP Status",
+        "hint": "💡 Make sure backend API is running: make up"
+      },
+      "success": {
+        "title": "✓ API is responding successfully!",
+        "status": "Status",
+        "service": "Service",
+        "showJson": "📄 Show full JSON response"
+      }
+    },
+    "router": {
+      "title": "3. React Router",
+      "test404": "404 Page (test)"
+    }
+  },
+  "register": {
+    "title": "Registration",
+    "email": {
+      "label": "Email",
+      "placeholder": "example@email.com",
+      "required": "Email is required",
+      "invalid": "Invalid email format"
+    },
+    "username": {
+      "label": "Username",
+      "placeholder": "username",
+      "required": "Username is required",
+      "minLength": "Username must be at least 3 characters",
+      "maxLength": "Username must be no more than 100 characters",
+      "invalid": "Username can only contain letters, numbers and underscores"
+    },
+    "password": {
+      "label": "Password",
+      "placeholder": "At least 6 characters",
+      "required": "Password is required",
+      "minLength": "Password must be at least 6 characters"
+    },
+    "confirmPassword": {
+      "label": "Confirm Password",
+      "placeholder": "Repeat password",
+      "required": "Password confirmation is required",
+      "mismatch": "Passwords do not match"
+    },
+    "submit": "Register",
+    "submitting": "Registering...",
+    "success": "✓ Registration successful! Redirecting...",
+    "error": "An error occurred during registration",
+    "hasAccount": "Already have an account?",
+    "loginLink": "Login"
+  },
+  "notFound": {
+    "title": "404",
+    "message": "Page Not Found",
+    "description": "Sorry, the requested page does not exist.",
+    "goHome": "Go to Home"
+  }
+}
+

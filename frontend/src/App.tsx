@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom'
 import { useTheme } from './theme/useTheme'
 import { MainLayout } from './components/layouts/MainLayout'
 import HomePage from './pages/HomePage'
+import RegisterPage from './pages/RegisterPage'
 import NotFoundPage from './pages/NotFoundPage'
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
     <MainLayout>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/register" element={<RegisterPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </MainLayout>

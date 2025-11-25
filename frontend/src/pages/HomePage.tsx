@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useApi } from '../hooks/useApi'
 import { apiEndpoints } from '../services/apiEndpoints'
 import { Card } from '../components/ui/Card'
@@ -6,6 +7,7 @@ import { Button } from '../components/ui/Button'
 import { useTheme } from '../theme/useTheme'
 
 function HomePage() {
+  const { t } = useTranslation()
   // Демонстрация использования темы
   const { theme } = useTheme()
   
@@ -14,36 +16,36 @@ function HomePage() {
 
   return (
     <div>
-      <h1>Roadmap Frontend</h1>
-      <p style={{ color: 'var(--color-text-secondary)' }}>Добро пожаловать в приложение!</p>
+      <h1>{t('home.title')}</h1>
+      <p style={{ color: 'var(--color-text-secondary)' }}>{t('common.welcome')}</p>
       
       <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
-        <h2>Демонстрация настроенных инструментов:</h2>
+        <h2>{t('home.demoTitle')}</h2>
         
-        <Card title="1. Система тем">
+        <Card title={t('home.theme.title')}>
           <p style={{ color: 'var(--color-text-secondary)' }}>
-            Текущая тема: <strong style={{ color: 'var(--color-text)' }}>{theme}</strong>
+            {t('home.theme.current')}: <strong style={{ color: 'var(--color-text)' }}>{theme}</strong>
           </p>
           <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
-            Тема переключается через кнопку в header. Изменения применяются ко всему приложению автоматически.
+            {t('home.theme.description')}
           </p>
         </Card>
 
-        <Card title="2. Axios HTTP Client">
+        <Card title={t('home.api.title')}>
           <p style={{ fontSize: '0.9em', color: 'var(--color-text-secondary)', marginBottom: '0.5em' }}>
-            Нажмите кнопку ниже, чтобы проверить подключение к backend API
+            {t('home.api.description')}
           </p>
           <Button 
             onClick={() => execute()} 
             disabled={loading}
             variant="primary"
           >
-            {loading ? 'Проверка...' : 'Проверить здоровье API'}
+            {loading ? t('home.api.checking') : t('home.api.checkButton')}
           </Button>
           
           {loading && (
             <div style={{ marginTop: '1em', color: 'var(--color-text-secondary)' }}>
-              <p>⏳ Отправка запроса к API...</p>
+              <p>{t('home.api.sending')}</p>
             </div>
           )}
           
@@ -63,15 +65,15 @@ function HomePage() {
                 borderRadius: 'var(--radius-md)',
                 border: '1px solid var(--color-error)',
               }}>
-                <p style={{ color: 'var(--color-error)', fontWeight: 'bold', marginBottom: '0.5em' }}>❌ Ошибка подключения</p>
-                <p style={{ color: 'var(--color-text)' }}><strong>Сообщение:</strong> {error.message}</p>
+                <p style={{ color: 'var(--color-error)', fontWeight: 'bold', marginBottom: '0.5em' }}>{t('home.api.error.title')}</p>
+                <p style={{ color: 'var(--color-text)' }}><strong>{t('home.api.error.message')}:</strong> {error.message}</p>
                 {error.response && (
                   <p style={{ color: 'var(--color-text)', marginTop: '0.5em' }}>
-                    <strong>HTTP статус:</strong> {error.response.status} - {error.response.statusText}
+                    <strong>{t('home.api.error.httpStatus')}:</strong> {error.response.status} - {error.response.statusText}
                   </p>
                 )}
                 <p style={{ fontSize: '0.9em', color: 'var(--color-text-muted)', marginTop: '0.5em' }}>
-                  💡 Убедитесь, что backend API запущен: <code>make up</code>
+                  {t('home.api.error.hint')}
                 </p>
               </div>
             </div>
@@ -85,14 +87,14 @@ function HomePage() {
               border: '1px solid var(--color-success)', 
               borderRadius: 'var(--radius-md)',
             }}>
-              <p style={{ color: 'var(--color-success)', fontWeight: 'bold', marginBottom: '0.5em' }}>✓ API успешно отвечает!</p>
+              <p style={{ color: 'var(--color-success)', fontWeight: 'bold', marginBottom: '0.5em' }}>{t('home.api.success.title')}</p>
               <div style={{ fontSize: '0.95em', marginTop: '0.5em', color: 'var(--color-text)' }}>
-                <p><strong>Статус:</strong> <span style={{ color: 'var(--color-success)' }}>{data.status}</span></p>
-                <p><strong>Сервис:</strong> {data.service}</p>
+                <p><strong>{t('home.api.success.status')}:</strong> <span style={{ color: 'var(--color-success)' }}>{data.status}</span></p>
+                <p><strong>{t('home.api.success.service')}:</strong> {data.service}</p>
               </div>
               <details style={{ marginTop: '0.75em', fontSize: '0.85em' }}>
                 <summary style={{ cursor: 'pointer', color: 'var(--color-text-muted)', userSelect: 'none' }}>
-                  📄 Показать полный JSON ответ
+                  {t('home.api.success.showJson')}
                 </summary>
                 <pre style={{ 
                   marginTop: '0.5em', 
@@ -112,7 +114,7 @@ function HomePage() {
           )}
         </Card>
 
-        <Card title="3. React Router">
+        <Card title={t('home.router.title')}>
           <nav style={{ display: 'flex', gap: 'var(--spacing-md)', flexWrap: 'wrap' }}>
             <Link 
               to="/" 
@@ -123,7 +125,7 @@ function HomePage() {
                 borderRadius: 'var(--radius-sm)',
               }}
             >
-              Главная
+              {t('navigation.home')}
             </Link>
             <Link 
               to="/404" 
@@ -134,7 +136,7 @@ function HomePage() {
                 borderRadius: 'var(--radius-sm)',
               }}
             >
-              Страница 404 (тест)
+              {t('home.router.test404')}
             </Link>
           </nav>
         </Card>
