@@ -371,7 +371,6 @@ function RegisterPage() {
               <strong style={{ display: 'block', marginBottom: 'var(--spacing-xs)' }}>
                 {t('register.success')}
               </strong>
-              {t('register.success')}
             </div>
           )}
 
