@@ -1,6 +1,5 @@
 .PHONY: up up-dev down build rebuild logs ps clean db-shell db-tables db-describe db-size db-tables-size db-info restart-api logs-api logs-db logs-frontend wait-health test test-short test-verbose test-coverage test-unit test-integration lint lint-fix format workflow frontend-build-docker frontend-dev-docker frontend-restart frontend-logs frontend-shell frontend-clean-docker help
 
-# Coverage threshold (minimum required coverage percentage)
 COVERAGE_THRESHOLD ?= 50.0
 
 up:
