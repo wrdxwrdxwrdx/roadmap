@@ -40,4 +40,3 @@ export const apiEndpoints = {
   updateUser: (id: number, user: Partial<User>) => apiClient.put<User>(`/users/${id}`, user),
   deleteUser: (id: number) => apiClient.delete(`/users/${id}`),
 }
-
