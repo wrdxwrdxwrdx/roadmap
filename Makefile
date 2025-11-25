@@ -1,10 +1,9 @@
 .PHONY: up up-dev down build rebuild logs ps clean db-shell db-tables db-describe db-size db-tables-size db-info restart-api logs-api logs-db logs-frontend wait-health test test-short test-verbose test-coverage test-unit test-integration lint lint-fix format workflow frontend-build-docker frontend-dev-docker frontend-restart frontend-logs frontend-shell frontend-clean-docker help
 
+# Coverage threshold (minimum required coverage percentage)
 COVERAGE_THRESHOLD ?= 50.0
 
->>>>>>> d064e7a (fix: golint + test coverage)
-COVERAGE_THRESHOLD ?= 50.0
-
+# Start all services (production)
 up:
 	docker-compose up -d --build
 	@echo "Waiting for services to be healthy..."
@@ -319,22 +318,6 @@ help:
 	@echo "  make db-tables-size  - Show table sizes"
 	@echo "  make db-info         - Show database information"
 	@echo ""
-	@echo "Testing commands:"
-	@echo "  make test            - Run all tests"
-	@echo "  make test-short      - Run tests with short summary"
-<<<<<<< HEAD
-	@echo "  make test-verbose    - Run tests with verbose output"
-	@echo "  make test-coverage   - Run tests with coverage report"
-	@echo "  make test-unit       - Run unit tests only"
-	@echo "  make test-integration - Run integration tests"
->>>>>>> c26dd4f (feat: Init frontend)
-	@echo ""
-	@echo "Code quality commands:"
-	@echo "  make lint            - Run linters"
-	@echo "  make lint-fix        - Fix linting issues automatically"
-	@echo "  make format          - Format code"
-	@echo "  make workflow        - Run full CI workflow locally"
-	@echo ""
 	@echo "Frontend Docker commands:"
 	@echo "  make frontend-build-docker  - Build frontend Docker image for production"
 	@echo "  make frontend-dev-docker    - Start frontend in development mode (Docker, hot reload)"
@@ -342,5 +325,19 @@ help:
 	@echo "  make frontend-logs          - View frontend logs"
 	@echo "  make frontend-shell         - Open shell in frontend container"
 	@echo "  make frontend-clean-docker  - Clean frontend Docker images and containers"
+	@echo ""
+	@echo "Testing commands:"
+	@echo "  make test            - Run all tests"
+	@echo "  make test-short      - Run tests with short summary"
+	@echo "  make test-verbose    - Run tests with verbose output"
+	@echo "  make test-coverage   - Run tests with coverage report"
+	@echo "  make test-unit       - Run only unit tests"
+	@echo "  make test-integration - Run integration tests"
+	@echo ""
+	@echo "Code quality commands:"
+	@echo "  make lint            - Run linters"
+	@echo "  make lint-fix        - Fix linting issues automatically"
+	@echo "  make format          - Format code"
+	@echo "  make workflow        - Run full CI workflow locally"
 	@echo ""
 	@echo "  make help            - Show this help message"
