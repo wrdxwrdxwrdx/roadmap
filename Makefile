@@ -1,8 +1,6 @@
-.PHONY: up down build rebuild logs ps clean db-shell db-tables db-describe db-size db-tables-size db-info restart-api logs-api logs-db wait-health test test-short test-verbose test-coverage test-unit test-integration lint lint-fix format workflow
+.PHONY: up up-dev down build rebuild logs ps clean db-shell db-tables db-describe db-size db-tables-size db-info restart-api logs-api logs-db logs-frontend wait-health test test-short test-verbose test-coverage test-unit test-integration lint lint-fix format workflow frontend-build-docker frontend-dev-docker frontend-restart frontend-logs frontend-shell frontend-clean-docker help
 
 # Coverage threshold (minimum required coverage percentage)
-COVERAGE_THRESHOLD ?= 50.0
-
 COVERAGE_THRESHOLD ?= 50.0
 
 # Start all services (production)
@@ -328,10 +326,12 @@ help:
 	@echo "Testing commands:"
 	@echo "  make test            - Run all tests"
 	@echo "  make test-short      - Run tests with short summary"
+<<<<<<< HEAD
 	@echo "  make test-verbose    - Run tests with verbose output"
 	@echo "  make test-coverage   - Run tests with coverage report"
 	@echo "  make test-unit       - Run unit tests only"
 	@echo "  make test-integration - Run integration tests"
+>>>>>>> c26dd4f (feat: Init frontend)
 	@echo ""
 	@echo "Code quality commands:"
 	@echo "  make lint            - Run linters"
