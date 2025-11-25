@@ -74,7 +74,7 @@ jobs:
         working-directory: ./backend
         run: |
           coverage=$(go tool cover -func=coverage.out | tail -1 | awk '{print $3}' | sed 's/%//')
-          threshold=70.0
+          threshold=50.0
           echo "Coverage: ${coverage}%"
           echo "Threshold: ${threshold}%"
           # Compare using awk

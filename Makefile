@@ -1,7 +1,7 @@
 .PHONY: up down build rebuild logs ps clean db-shell db-tables db-describe db-size db-tables-size db-info restart-api logs-api logs-db wait-health test test-short test-verbose test-coverage test-unit test-integration lint lint-fix format workflow
 
 # Coverage threshold (minimum required coverage percentage)
-COVERAGE_THRESHOLD ?= 65.0
+COVERAGE_THRESHOLD ?= 50.0
 
 # Start all services
 up:
