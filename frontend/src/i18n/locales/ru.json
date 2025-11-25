@@ -105,6 +105,35 @@
     "hasAccount": "Уже есть аккаунт?",
     "loginLink": "Войти"
   },
+  "login": {
+    "title": "Вход",
+    "email": {
+      "label": "Email",
+      "placeholder": "example@email.com",
+      "required": "Email обязателен",
+      "invalid": "Некорректный формат email"
+    },
+    "password": {
+      "label": "Пароль",
+      "placeholder": "Введите пароль",
+      "required": "Пароль обязателен"
+    },
+    "submit": "Войти",
+    "submitting": "Вход...",
+    "error": "Произошла ошибка при входе",
+    "noAccount": "Нет аккаунта?",
+    "registerLink": "Зарегистрироваться"
+  },
+  "profile": {
+    "title": "Профиль",
+    "loading": "Загрузка профиля...",
+    "error": "Ошибка загрузки профиля",
+    "errorMessage": "Не удалось загрузить данные профиля",
+    "retry": "Повторить",
+    "userId": "ID пользователя",
+    "username": "Имя пользователя",
+    "email": "Email"
+  },
   "notFound": {
     "title": "404",
     "message": "Страница не найдена",

@@ -1,5 +1,5 @@
-import { ReactNode } from 'react'
-import { Link } from 'react-router-dom'
+import { ReactNode, useState, useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '../../theme/useTheme'
 import { useLanguage } from '../../hooks/useLanguage'
@@ -16,6 +16,35 @@ export function MainLayout({ children }: MainLayoutProps) {
   const { theme, toggleTheme } = useTheme()
   const { t } = useTranslation()
   const { currentLanguage, toggleLanguage } = useLanguage()
+  const navigate = useNavigate()
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+
+  // Проверяем наличие токена
+  useEffect(() => {
+    const checkAuth = () => {
+      const token = localStorage.getItem('token')
+      setIsAuthenticated(!!token)
+    }
+    
+    checkAuth()
+    // Проверяем при изменении localStorage
+    const handleStorageChange = () => checkAuth()
+    window.addEventListener('storage', handleStorageChange)
+    
+    // Также проверяем периодически (на случай изменения в другой вкладке)
+    const interval = setInterval(checkAuth, 1000)
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      clearInterval(interval)
+    }
+  }, [])
+
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    setIsAuthenticated(false)
+    navigate('/login')
+  }
 
   return (
     <div className="main-layout" style={{
@@ -49,25 +78,93 @@ export function MainLayout({ children }: MainLayoutProps) {
             gap: 'var(--spacing-md)',
             alignItems: 'center',
           }}>
-            <Link
-              to="/register"
-              style={{
-                color: 'var(--color-text)',
-                textDecoration: 'none',
-                padding: 'var(--spacing-xs) var(--spacing-sm)',
-                borderRadius: 'var(--radius-md)',
-                fontSize: '0.9rem',
-                transition: 'background-color 0.2s ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'var(--color-hover)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent'
-              }}
-            >
-              {t('navigation.register')}
-            </Link>
+            {isAuthenticated ? (
+              <>
+                <Link
+                  to="/profile"
+                  style={{
+                    color: 'var(--color-text)',
+                    textDecoration: 'none',
+                    padding: 'var(--spacing-xs) var(--spacing-sm)',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: '0.9rem',
+                    transition: 'background-color 0.2s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-hover)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent'
+                  }}
+                >
+                  {t('navigation.profile')}
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  style={{
+                    color: 'var(--color-text)',
+                    textDecoration: 'none',
+                    padding: 'var(--spacing-xs) var(--spacing-sm)',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: '0.9rem',
+                    transition: 'background-color 0.2s ease',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontFamily: 'inherit',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-hover)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent'
+                  }}
+                >
+                  {t('navigation.logout')}
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  style={{
+                    color: 'var(--color-text)',
+                    textDecoration: 'none',
+                    padding: 'var(--spacing-xs) var(--spacing-sm)',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: '0.9rem',
+                    transition: 'background-color 0.2s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-hover)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent'
+                  }}
+                >
+                  {t('navigation.login')}
+                </Link>
+                <Link
+                  to="/register"
+                  style={{
+                    color: 'var(--color-text)',
+                    textDecoration: 'none',
+                    padding: 'var(--spacing-xs) var(--spacing-sm)',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: '0.9rem',
+                    transition: 'background-color 0.2s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-hover)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent'
+                  }}
+                >
+                  {t('navigation.register')}
+                </Link>
+              </>
+            )}
           </nav>
           
           <div style={{

@@ -1,43 +1,29 @@
-import { useState, FormEvent } from 'react'
+import { useState, FormEvent, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useApi } from '../hooks/useApi'
-import { apiEndpoints } from '../services/apiEndpoints'
+import { apiEndpoints, LoginRequest, LoginResponse } from '../services/apiEndpoints'
 import { Card } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
 
-interface RegisterFormData {
+interface LoginFormData {
   email: string
-  username: string
   password: string
-  confirmPassword: string
 }
 
-interface RegisterResponse {
-  id: string
-  username: string
-  email: string
-  token: string
-  created_at: string
-  updated_at: string
-}
-
-function RegisterPage() {
+function LoginPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const [formData, setFormData] = useState<RegisterFormData>({
+  const [formData, setFormData] = useState<LoginFormData>({
     email: '',
-    username: '',
     password: '',
-    confirmPassword: '',
   })
-  const [errors, setErrors] = useState<Partial<Record<keyof RegisterFormData, string>>>({})
-  const [touched, setTouched] = useState<Partial<Record<keyof RegisterFormData, boolean>>>({})
+  const [errors, setErrors] = useState<Partial<Record<keyof LoginFormData, string>>>({})
+  const [touched, setTouched] = useState<Partial<Record<keyof LoginFormData, boolean>>>({})
 
-  // Используем useApi для регистрации
-  const { data, loading, error, execute, reset } = useApi<RegisterResponse>(
-    (registerData: { email: string; username: string; password: string }) => 
-      apiEndpoints.register(registerData),
+  // Используем useApi для логина
+  const { loading, error, execute, reset } = useApi<LoginResponse>(
+    (loginData: LoginRequest) => apiEndpoints.login(loginData),
     {
       onSuccess: (response) => {
         // Сохраняем токен
@@ -48,25 +34,14 @@ function RegisterPage() {
     }
   )
 
-  const validateField = (name: keyof RegisterFormData, value: string): string => {
+  const validateField = (name: keyof LoginFormData, value: string): string => {
     switch (name) {
       case 'email':
-        if (!value) return t('register.email.required')
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return t('register.email.invalid')
-        return ''
-      case 'username':
-        if (!value) return t('register.username.required')
-        if (value.length < 3) return t('register.username.minLength')
-        if (value.length > 100) return t('register.username.maxLength')
-        if (!/^[a-zA-Z0-9_]+$/.test(value)) return t('register.username.invalid')
+        if (!value) return t('login.email.required')
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return t('login.email.invalid')
         return ''
       case 'password':
-        if (!value) return t('register.password.required')
-        if (value.length < 8) return t('register.password.minLength')
-        return ''
-      case 'confirmPassword':
-        if (!value) return t('register.confirmPassword.required')
-        if (value !== formData.password) return t('register.confirmPassword.mismatch')
+        if (!value) return t('login.password.required')
         return ''
       default:
         return ''
@@ -78,8 +53,8 @@ function RegisterPage() {
     setFormData(prev => ({ ...prev, [name]: value }))
     
     // Валидация при изменении (если поле уже было тронуто)
-    if (touched[name as keyof RegisterFormData]) {
-      const error = validateField(name as keyof RegisterFormData, value)
+    if (touched[name as keyof LoginFormData]) {
+      const error = validateField(name as keyof LoginFormData, value)
       setErrors(prev => ({ ...prev, [name]: error }))
     }
   }
@@ -87,16 +62,16 @@ function RegisterPage() {
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setTouched(prev => ({ ...prev, [name]: true }))
-    const error = validateField(name as keyof RegisterFormData, value)
+    const error = validateField(name as keyof LoginFormData, value)
     setErrors(prev => ({ ...prev, [name]: error }))
   }
 
   const validateForm = (): boolean => {
-    const newErrors: Partial<Record<keyof RegisterFormData, string>> = {}
+    const newErrors: Partial<Record<keyof LoginFormData, string>> = {}
     let isValid = true
 
     Object.keys(formData).forEach(key => {
-      const fieldName = key as keyof RegisterFormData
+      const fieldName = key as keyof LoginFormData
       const error = validateField(fieldName, formData[fieldName])
       if (error) {
         newErrors[fieldName] = error
@@ -107,9 +82,7 @@ function RegisterPage() {
     setErrors(newErrors)
     setTouched({
       email: true,
-      username: true,
       password: true,
-      confirmPassword: true,
     })
 
     return isValid
@@ -118,7 +91,7 @@ function RegisterPage() {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     
-    // Сбрасываем предыдущие ошибки и успешные сообщения
+    // Сбрасываем предыдущие ошибки
     reset()
     
     if (!validateForm()) {
@@ -128,21 +101,28 @@ function RegisterPage() {
     try {
       await execute({
         email: formData.email,
-        username: formData.username,
         password: formData.password,
       })
     } catch (err) {
       // Ошибка уже обработана в useApi
-      console.error('Registration error:', err)
+      console.error('Login error:', err)
     }
   }
 
-  const getFieldError = (fieldName: keyof RegisterFormData): string | undefined => {
+  const getFieldError = (fieldName: keyof LoginFormData): string | undefined => {
     return touched[fieldName] ? errors[fieldName] : undefined
   }
 
   const isFormValid = Object.values(errors).every(err => !err) && 
                       Object.values(formData).every(val => val !== '')
+
+  // Проверяем, не авторизован ли уже пользователь
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    if (token) {
+      navigate('/profile')
+    }
+  }, [navigate])
 
   return (
     <div style={{
@@ -157,7 +137,7 @@ function RegisterPage() {
           textAlign: 'center',
           color: 'var(--color-text)',
         }}>
-          {t('register.title')}
+          {t('login.title')}
         </h1>
 
         <form onSubmit={handleSubmit} style={{
@@ -173,7 +153,7 @@ function RegisterPage() {
               color: 'var(--color-text)',
               fontWeight: 500,
             }}>
-              {t('register.email.label')} *
+              {t('login.email.label')} *
             </label>
             <input
               type="email"
@@ -192,7 +172,7 @@ function RegisterPage() {
                 color: 'var(--color-text)',
                 boxSizing: 'border-box',
               }}
-              placeholder={t('register.email.placeholder')}
+              placeholder={t('login.email.placeholder')}
               disabled={loading}
             />
             {getFieldError('email') && (
@@ -206,47 +186,6 @@ function RegisterPage() {
             )}
           </div>
 
-          {/* Username */}
-          <div>
-            <label htmlFor="username" style={{
-              display: 'block',
-              marginBottom: 'var(--spacing-xs)',
-              color: 'var(--color-text)',
-              fontWeight: 500,
-            }}>
-              {t('register.username.label')} *
-            </label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              style={{
-                width: '100%',
-                padding: 'var(--spacing-sm)',
-                fontSize: '1rem',
-                border: `1px solid ${getFieldError('username') ? 'var(--color-error)' : 'var(--color-border)'}`,
-                borderRadius: 'var(--radius-md)',
-                backgroundColor: 'var(--color-background)',
-                color: 'var(--color-text)',
-                boxSizing: 'border-box',
-              }}
-              placeholder={t('register.username.placeholder')}
-              disabled={loading}
-            />
-            {getFieldError('username') && (
-              <p style={{
-                margin: 'var(--spacing-xs) 0 0 0',
-                color: 'var(--color-error)',
-                fontSize: '0.875rem',
-              }}>
-                {getFieldError('username')}
-              </p>
-            )}
-          </div>
-
           {/* Password */}
           <div>
             <label htmlFor="password" style={{
@@ -255,7 +194,7 @@ function RegisterPage() {
               color: 'var(--color-text)',
               fontWeight: 500,
             }}>
-              {t('register.password.label')} *
+              {t('login.password.label')} *
             </label>
             <input
               type="password"
@@ -274,7 +213,7 @@ function RegisterPage() {
                 color: 'var(--color-text)',
                 boxSizing: 'border-box',
               }}
-              placeholder={t('register.password.placeholder')}
+              placeholder={t('login.password.placeholder')}
               disabled={loading}
             />
             {getFieldError('password') && (
@@ -288,48 +227,7 @@ function RegisterPage() {
             )}
           </div>
 
-          {/* Confirm Password */}
-          <div>
-            <label htmlFor="confirmPassword" style={{
-              display: 'block',
-              marginBottom: 'var(--spacing-xs)',
-              color: 'var(--color-text)',
-              fontWeight: 500,
-            }}>
-              {t('register.confirmPassword.label')} *
-            </label>
-            <input
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              style={{
-                width: '100%',
-                padding: 'var(--spacing-sm)',
-                fontSize: '1rem',
-                border: `1px solid ${getFieldError('confirmPassword') ? 'var(--color-error)' : 'var(--color-border)'}`,
-                borderRadius: 'var(--radius-md)',
-                backgroundColor: 'var(--color-background)',
-                color: 'var(--color-text)',
-                boxSizing: 'border-box',
-              }}
-              placeholder={t('register.confirmPassword.placeholder')}
-              disabled={loading}
-            />
-            {getFieldError('confirmPassword') && (
-              <p style={{
-                margin: 'var(--spacing-xs) 0 0 0',
-                color: 'var(--color-error)',
-                fontSize: '0.875rem',
-              }}>
-                {getFieldError('confirmPassword')}
-              </p>
-            )}
-          </div>
-
-          {/* Error message from API - красное окно */}
+          {/* Error message from API */}
           {error && !loading && (
             <div style={{
               padding: 'var(--spacing-md)',
@@ -342,7 +240,7 @@ function RegisterPage() {
               marginTop: 'var(--spacing-sm)',
             }}>
               <strong style={{ display: 'block', marginBottom: 'var(--spacing-xs)' }}>
-                {t('register.error')}
+                {t('login.error')}
               </strong>
               {(() => {
                 if (error.response?.data) {
@@ -351,27 +249,8 @@ function RegisterPage() {
                   if (typeof errorData === 'string') return errorData
                   if (errorData.error) return errorData.error
                 }
-                return error.message || t('register.error')
+                return error.message || t('login.error')
               })()}
-            </div>
-          )}
-
-          {/* Success message - зеленое окно */}
-          {data && !loading && !error && (
-            <div style={{
-              padding: 'var(--spacing-md)',
-              backgroundColor: 'rgba(40, 167, 69, 0.15)',
-              border: '2px solid #28a745',
-              borderRadius: 'var(--radius-md)',
-              color: '#28a745',
-              fontSize: '0.9rem',
-              fontWeight: 500,
-              marginTop: 'var(--spacing-sm)',
-            }}>
-              <strong style={{ display: 'block', marginBottom: 'var(--spacing-xs)' }}>
-                {t('register.success')}
-              </strong>
-              {t('register.success')}
             </div>
           )}
 
@@ -386,27 +265,27 @@ function RegisterPage() {
               marginTop: 'var(--spacing-sm)',
             }}
           >
-            {loading ? t('register.submitting') : t('register.submit')}
+            {loading ? t('login.submitting') : t('login.submit')}
           </Button>
         </form>
 
-        {/* Link to login */}
+        {/* Link to register */}
         <div style={{
           marginTop: 'var(--spacing-lg)',
           textAlign: 'center',
           color: 'var(--color-text-secondary)',
           fontSize: '0.9rem',
         }}>
-          {t('register.hasAccount')}{' '}
+          {t('login.noAccount')}{' '}
           <Link
-            to="/login"
+            to="/register"
             style={{
               color: 'var(--color-primary)',
               textDecoration: 'none',
               fontWeight: 500,
             }}
           >
-            {t('register.loginLink')}
+            {t('login.registerLink')}
           </Link>
         </div>
       </Card>
@@ -414,5 +293,5 @@ function RegisterPage() {
   )
 }
 
-export default RegisterPage
+export default LoginPage
 

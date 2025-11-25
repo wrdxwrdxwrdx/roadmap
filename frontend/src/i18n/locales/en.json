@@ -105,6 +105,35 @@
     "hasAccount": "Already have an account?",
     "loginLink": "Login"
   },
+  "login": {
+    "title": "Login",
+    "email": {
+      "label": "Email",
+      "placeholder": "example@email.com",
+      "required": "Email is required",
+      "invalid": "Invalid email format"
+    },
+    "password": {
+      "label": "Password",
+      "placeholder": "Enter password",
+      "required": "Password is required"
+    },
+    "submit": "Login",
+    "submitting": "Logging in...",
+    "error": "An error occurred during login",
+    "noAccount": "Don't have an account?",
+    "registerLink": "Register"
+  },
+  "profile": {
+    "title": "Profile",
+    "loading": "Loading profile...",
+    "error": "Error loading profile",
+    "errorMessage": "Failed to load profile data",
+    "retry": "Retry",
+    "userId": "User ID",
+    "username": "Username",
+    "email": "Email"
+  },
   "notFound": {
     "title": "404",
     "message": "Page Not Found",

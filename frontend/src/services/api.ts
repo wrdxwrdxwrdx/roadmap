@@ -12,11 +12,11 @@ const apiClient: AxiosInstance = axios.create({
 // Интерсептор для запросов - добавляет токены авторизации, логирование и т.д.
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // Здесь можно добавить токен авторизации из store или localStorage
-    // const token = localStorage.getItem('token')
-    // if (token && config.headers) {
-    //   config.headers.Authorization = `Bearer ${token}`
-    // }
+    // Добавляем токен авторизации из localStorage
+    const token = localStorage.getItem('token')
+    if (token && config.headers) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
     
     // Логирование запросов (только в development)
     if (import.meta.env.DEV) {
@@ -47,9 +47,12 @@ apiClient.interceptors.response.use(
       // Сервер ответил с кодом ошибки
       switch (error.response.status) {
         case 401:
-          // Не авторизован - можно перенаправить на страницу логина
+          // Не авторизован - удаляем токен и перенаправляем на страницу логина
           console.error('[API Error] Unauthorized')
-          // window.location.href = '/login'
+          localStorage.removeItem('token')
+          if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+            window.location.href = '/login'
+          }
           break
         case 403:
           console.error('[API Error] Forbidden')

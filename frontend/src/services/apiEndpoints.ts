@@ -27,6 +27,21 @@ export interface RegisterResponse {
   updated_at: string
 }
 
+export interface LoginRequest {
+  email: string
+  password: string
+}
+
+export interface LoginResponse {
+  token: string
+}
+
+export interface ProfileResponse {
+  user_id: string
+  username: string
+  email: string
+}
+
 // Пример API endpoints
 export const apiEndpoints = {
   // Health check
@@ -34,8 +49,10 @@ export const apiEndpoints = {
   
   // Authentication
   register: (data: RegisterRequest) => apiClient.post<RegisterResponse>('/v1/users/register', data),
+  login: (data: LoginRequest) => apiClient.post<LoginResponse>('/v1/users/login', data),
   
   // Users
+  getProfile: () => apiClient.get<ProfileResponse>('/v1/users/profile'),
   getUsers: () => apiClient.get<User[]>('/users'),
   getUserById: (id: number) => apiClient.get<User>(`/users/${id}`),
   createUser: (user: Omit<User, 'id'>) => apiClient.post<User>('/users', user),
