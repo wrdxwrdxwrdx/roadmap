@@ -46,6 +46,20 @@ services:
       - roadmap-network
     restart: unless-stopped
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: roadmap-frontend
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - roadmap-network
+    restart: unless-stopped
+
 volumes:
   postgres_data:
     driver: local
