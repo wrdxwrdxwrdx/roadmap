@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"log"
 	"path/filepath"
 
 	"github.com/golang-migrate/migrate/v4"
@@ -22,7 +23,11 @@ func RunMigrations(dsn string, migrationsPath string) error {
 	if err != nil {
 		return fmt.Errorf("failed to create migrate instance: %w", err)
 	}
-	defer m.Close()
+	defer func() {
+		if closeErr, _ := m.Close(); closeErr != nil {
+			log.Printf("Failed to close migrate instance: %v", closeErr)
+		}
+	}()
 
 	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
 		return fmt.Errorf("failed to run migrations: %w", err)
