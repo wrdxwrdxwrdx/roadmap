@@ -45,7 +45,7 @@ export interface ProfileResponse {
 // Пример API endpoints
 export const apiEndpoints = {
   // Health check
-  healthCheck: () => apiClient.get<HealthCheckResponse>('/health'),
+  healthCheck: () => apiClient.get<HealthCheckResponse>('/v1/health'),
   
   // Authentication
   register: (data: RegisterRequest) => apiClient.post<RegisterResponse>('/v1/users/register', data),

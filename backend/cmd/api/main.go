@@ -78,10 +78,9 @@ func main() {
 
 	api := router.Group("/api/v1")
 	{
+		api.GET("/health", handler.HealthHandler)
 		userhandler.SetupUserRoutes(api, userHandler, authMiddleware)
 	}
-
-	router.GET("/health", handler.HealthHandler)
 
 	if err := router.Run(":8080"); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
