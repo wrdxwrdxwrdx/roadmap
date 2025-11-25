@@ -15,9 +15,11 @@ interface RegisterFormData {
 
 interface RegisterResponse {
   id: string
-  email: string
   username: string
-  message?: string
+  email: string
+  token: string
+  created_at: string
+  updated_at: string
 }
 
 function RegisterPage() {
@@ -51,7 +53,7 @@ function RegisterPage() {
         return ''
       case 'password':
         if (!value) return t('register.password.required')
-        if (value.length < 6) return t('register.password.minLength')
+        if (value.length < 8) return t('register.password.minLength')
         return ''
       case 'confirmPassword':
         if (!value) return t('register.confirmPassword.required')
@@ -358,9 +360,9 @@ function RegisterPage() {
               marginTop: 'var(--spacing-sm)',
             }}>
               <strong style={{ display: 'block', marginBottom: 'var(--spacing-xs)' }}>
-              {t('register.success')}
+                {t('register.success')}
               </strong>
-              {data.message || t('register.success')}
+              {t('register.success')}
             </div>
           )}
 

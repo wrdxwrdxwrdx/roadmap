@@ -6,10 +6,13 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Копируем файлы зависимостей
+# Копируем оба файла - package-lock.json должен существовать в build context
 COPY package.json package-lock.json ./
 
 # Устанавливаем зависимости
-RUN npm ci
+# Используем npm ci для точного воспроизведения зависимостей из lockfile
+# Если npm ci не работает, fallback на npm install
+RUN npm ci || npm install
 
 # Копируем исходный код
 COPY . .

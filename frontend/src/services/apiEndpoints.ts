@@ -20,9 +20,11 @@ export interface RegisterRequest {
 
 export interface RegisterResponse {
   id: string
-  email: string
   username: string
-  message?: string
+  email: string
+  token: string
+  created_at: string
+  updated_at: string
 }
 
 // Пример API endpoints
@@ -31,7 +33,7 @@ export const apiEndpoints = {
   healthCheck: () => apiClient.get<HealthCheckResponse>('/health'),
   
   // Authentication
-  register: (data: RegisterRequest) => apiClient.post<RegisterResponse>('/auth/register', data),
+  register: (data: RegisterRequest) => apiClient.post<RegisterResponse>('/v1/users/register', data),
   
   // Users
   getUsers: () => apiClient.get<User[]>('/users'),
