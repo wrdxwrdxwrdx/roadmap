@@ -320,10 +320,12 @@ help:
 	@echo "Testing commands:"
 	@echo "  make test            - Run all tests"
 	@echo "  make test-short      - Run tests with short summary"
+<<<<<<< HEAD
 	@echo "  make test-verbose    - Run tests with verbose output"
 	@echo "  make test-coverage   - Run tests with coverage report"
 	@echo "  make test-unit       - Run unit tests only"
 	@echo "  make test-integration - Run integration tests"
+>>>>>>> c26dd4f (feat: Init frontend)
 	@echo ""
 	@echo "Code quality commands:"
 	@echo "  make lint            - Run linters"
