@@ -1,0 +1,144 @@
+{
+  "common": {
+    "appName": "Roadmap",
+    "welcome": "Добро пожаловать в приложение!",
+    "loading": "Загрузка...",
+    "error": "Ошибка",
+    "success": "Успешно",
+    "cancel": "Отмена",
+    "save": "Сохранить",
+    "delete": "Удалить",
+    "edit": "Редактировать",
+    "close": "Закрыть",
+    "back": "Назад",
+    "next": "Далее",
+    "submit": "Отправить",
+    "search": "Поиск",
+    "filter": "Фильтр",
+    "sort": "Сортировка",
+    "actions": "Действия"
+  },
+  "navigation": {
+    "home": "Главная",
+    "register": "Регистрация",
+    "login": "Войти",
+    "logout": "Выйти",
+    "profile": "Профиль",
+    "settings": "Настройки"
+  },
+  "theme": {
+    "light": "Светлая",
+    "dark": "Темная",
+    "toggle": "Переключить тему",
+    "current": "Текущая тема"
+  },
+  "language": {
+    "title": "Язык",
+    "english": "English",
+    "russian": "Русский",
+    "switch": "Переключить язык"
+  },
+  "home": {
+    "title": "Roadmap Frontend",
+    "demoTitle": "Демонстрация настроенных инструментов:",
+    "theme": {
+      "title": "1. Система тем",
+      "current": "Текущая тема",
+      "description": "Тема переключается через кнопку в header. Изменения применяются ко всему приложению автоматически."
+    },
+    "api": {
+      "title": "2. Axios HTTP Client",
+      "description": "Нажмите кнопку ниже, чтобы проверить подключение к backend API",
+      "checkButton": "Проверить здоровье API",
+      "checking": "Проверка...",
+      "sending": "⏳ Отправка запроса к API...",
+      "error": {
+        "title": "❌ Ошибка подключения",
+        "message": "Сообщение",
+        "httpStatus": "HTTP статус",
+        "hint": "💡 Убедитесь, что backend API запущен: make up"
+      },
+      "success": {
+        "title": "✓ API успешно отвечает!",
+        "status": "Статус",
+        "service": "Сервис",
+        "showJson": "📄 Показать полный JSON ответ"
+      }
+    },
+    "router": {
+      "title": "3. React Router",
+      "test404": "Страница 404 (тест)"
+    }
+  },
+  "register": {
+    "title": "Регистрация",
+    "email": {
+      "label": "Email",
+      "placeholder": "example@email.com",
+      "required": "Email обязателен",
+      "invalid": "Некорректный формат email"
+    },
+    "username": {
+      "label": "Имя пользователя",
+      "placeholder": "username",
+      "required": "Имя пользователя обязательно",
+      "minLength": "Имя пользователя должно быть не менее 3 символов",
+      "maxLength": "Имя пользователя должно быть не более 100 символов",
+      "invalid": "Имя пользователя может содержать только буквы, цифры и подчеркивание"
+    },
+    "password": {
+      "label": "Пароль",
+      "placeholder": "Минимум 6 символов",
+      "required": "Пароль обязателен",
+      "minLength": "Пароль должен быть не менее 6 символов"
+    },
+    "confirmPassword": {
+      "label": "Подтверждение пароля",
+      "placeholder": "Повторите пароль",
+      "required": "Подтверждение пароля обязательно",
+      "mismatch": "Пароли не совпадают"
+    },
+    "submit": "Зарегистрироваться",
+    "submitting": "Регистрация...",
+    "success": "✓ Регистрация успешна! Перенаправление...",
+    "error": "Произошла ошибка при регистрации",
+    "hasAccount": "Уже есть аккаунт?",
+    "loginLink": "Войти"
+  },
+  "login": {
+    "title": "Вход",
+    "email": {
+      "label": "Email",
+      "placeholder": "example@email.com",
+      "required": "Email обязателен",
+      "invalid": "Некорректный формат email"
+    },
+    "password": {
+      "label": "Пароль",
+      "placeholder": "Введите пароль",
+      "required": "Пароль обязателен"
+    },
+    "submit": "Войти",
+    "submitting": "Вход...",
+    "error": "Произошла ошибка при входе",
+    "noAccount": "Нет аккаунта?",
+    "registerLink": "Зарегистрироваться"
+  },
+  "profile": {
+    "title": "Профиль",
+    "loading": "Загрузка профиля...",
+    "error": "Ошибка загрузки профиля",
+    "errorMessage": "Не удалось загрузить данные профиля",
+    "retry": "Повторить",
+    "userId": "ID пользователя",
+    "username": "Имя пользователя",
+    "email": "Email"
+  },
+  "notFound": {
+    "title": "404",
+    "message": "Страница не найдена",
+    "description": "Извините, запрашиваемая страница не существует.",
+    "goHome": "Вернуться на главную"
+  }
+}
+

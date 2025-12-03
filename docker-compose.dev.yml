@@ -1,0 +1,29 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: roadmap-frontend-dev
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    volumes:
+      # Монтируем исходный код для hot reload (без :ro для возможности записи)
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+      - ./frontend/index.html:/app/index.html
+      - ./frontend/vite.config.ts:/app/vite.config.ts
+      - ./frontend/tsconfig.json:/app/tsconfig.json
+      - ./frontend/tsconfig.node.json:/app/tsconfig.node.json
+      - ./frontend/package.json:/app/package.json
+      # Исключаем node_modules из монтирования
+      - /app/node_modules
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - roadmap-network
+    environment:
+      - VITE_API_URL=http://api:8080
+      - CHOKIDAR_USEPOLLING=true
+    restart: unless-stopped
+
