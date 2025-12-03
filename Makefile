@@ -1,4 +1,7 @@
-.PHONY: up up-dev down build rebuild logs ps clean db-shell db-tables db-describe db-size db-tables-size db-info restart-api logs-api logs-db logs-frontend wait-health test test-short test-verbose test-coverage test-unit test-integration lint lint-fix format workflow frontend-build-docker frontend-dev-docker frontend-restart frontend-logs frontend-shell frontend-clean-docker help
+.PHONY: up down build rebuild logs ps clean db-shell db-tables db-describe db-size db-tables-size db-info restart-api logs-api logs-db wait-health test test-short test-verbose test-coverage test-unit test-integration lint lint-fix format workflow
+
+# Coverage threshold (minimum required coverage percentage)
+COVERAGE_THRESHOLD ?= 50.0
 
 COVERAGE_THRESHOLD ?= 50.0
 
@@ -18,6 +21,11 @@ up-dev:
 	docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d frontend
 	@echo "✓ All services are up in development mode!"
 	@bash -c 'FRONTEND_PORT=$${FRONTEND_PORT:-3000}; API_PORT=$${API_PORT:-8080}; echo "  - Frontend (dev): http://localhost:$$FRONTEND_PORT"; echo "  - API: http://localhost:$$API_PORT"'
+
+# Start all services
+up-build:
+	docker-compose up -d --build
+	@make up
 
 # Start all services
 up-build:
