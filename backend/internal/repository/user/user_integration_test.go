@@ -539,11 +539,7 @@ func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_EmailExists_Edge
 			name:      "case sensitive email check",
 			email:     "Test@Example.com",
 			setupUser: true,
-<<<<<<< HEAD
 			expected:  false,
-=======
-			expected:  false, 
->>>>>>> 1962dcb (feat: register + login + tests)
 		},
 		{
 			name:      "email with special characters",
@@ -602,11 +598,7 @@ func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_UsernameExists_E
 			name:      "case sensitive username check",
 			username:  "TestUser",
 			setupUser: true,
-<<<<<<< HEAD
 			expected:  false,
-=======
-			expected:  false, 
->>>>>>> 1962dcb (feat: register + login + tests)
 		},
 		{
 			name:      "username with numbers",
