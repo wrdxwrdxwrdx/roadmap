@@ -115,11 +115,7 @@ func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_Create_Duplicate
 	user2 := &userentity.User{
 		ID:           uuid.New(),
 		Username:     "testuser2",
-<<<<<<< HEAD
 		Email:        "duplicate@example.com",
-=======
-		Email:        "duplicate@example.com", 
->>>>>>> 1962dcb (feat: register + login + tests)
 		PasswordHash: "$2a$10$testhash2",
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
@@ -336,11 +332,7 @@ func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_Create_ErrorHand
 				return &userentity.User{
 					ID:           uuid.New(),
 					Username:     "uniqueuser2",
-<<<<<<< HEAD
 					Email:        "duplicate_email@example.com",
-=======
-					Email:        "duplicate_email@example.com", 
->>>>>>> 1962dcb (feat: register + login + tests)
 					PasswordHash: "$2a$10$testhash2",
 					CreatedAt:    time.Now(),
 					UpdatedAt:    time.Now(),
@@ -368,11 +360,7 @@ func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_Create_ErrorHand
 
 				return &userentity.User{
 					ID:           uuid.New(),
-<<<<<<< HEAD
 					Username:     "duplicate_username",
-=======
-					Username:     "duplicate_username", 
->>>>>>> 1962dcb (feat: register + login + tests)
 					Email:        "unique2@example.com",
 					PasswordHash: "$2a$10$testhash2",
 					CreatedAt:    time.Now(),
@@ -439,11 +427,7 @@ func (s *UserRepositoryIntegrationTestSuite) TestUserRepository_GetByID_ErrorHan
 		{
 			name: "non-existent ID returns not found error",
 			setupID: func() uuid.UUID {
-<<<<<<< HEAD
 				return uuid.New()
-=======
-				return uuid.New() 
->>>>>>> 1962dcb (feat: register + login + tests)
 			},
 			expectError: true,
 			errorCheck: func(t *testing.T, err error) {
